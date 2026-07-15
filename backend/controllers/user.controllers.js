@@ -152,6 +152,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+
 const logoutUser =async (req,res)=>{
 
   await User.findByIdAndUpdate(
@@ -181,8 +182,35 @@ const logoutUser =async (req,res)=>{
       });
 }
 
+const userProfile =async(req,res)=>{
+    try {
+        const user = await User.findById(req.user._id).select("-password -refreshToken")
+    
+        if(!user){
+            return res.status(401).json({
+                message:"User is not found"
+            })
+        }
+    
+        return res
+        .status(200)
+        .json({
+            message:"User Found",
+            user
+        })
+    } 
+    catch (error) {
+        return res
+        .status(500)
+        .json({
+            message:"User is not found",
+            error:error.message
+        })    
+    }
+}
+
 export{
     RegisterUser,
     loginUser,
-    logoutUser
+    logoutUser,userProfile
 }
