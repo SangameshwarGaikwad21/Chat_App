@@ -241,10 +241,9 @@ const updateUserAvatar = async(req,res)=>{
     );
 }
 
-
 const updateProfile = async(req,res)=>{
 
-    const {username,email} =req.body
+    const {username,email,bio} =req.body
 
     if(!username || !email){
         return res.status(400).json({
@@ -265,7 +264,7 @@ const updateProfile = async(req,res)=>{
 
     const updateUser = await User.findByIdAndUpdate(
         req.user._id,
-        { $set: { username, email } },
+        { $set: { username, email,bio } },
         { new: true, runValidators: true }
     ).select("-password -refreshToken")
 
@@ -281,5 +280,8 @@ const updateProfile = async(req,res)=>{
 export{
     RegisterUser,
     loginUser,
-    logoutUser,userProfile,updateProfile,updateUserAvatar
+    logoutUser,
+    userProfile,
+    updateProfile,
+    updateUserAvatar
 }

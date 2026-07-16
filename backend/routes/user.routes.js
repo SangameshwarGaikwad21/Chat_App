@@ -16,4 +16,6 @@ router.route("/logout").post(VerifyJWT,logoutUser)
 router.route("/me").get(VerifyJWT,userProfile)
 router.route("/update-profile").post(VerifyJWT,updateProfile)
 router.route("/update-avatar").post(VerifyJWT,upload.single("avatar"),updateUserAvatar)
+
+
 export default router
