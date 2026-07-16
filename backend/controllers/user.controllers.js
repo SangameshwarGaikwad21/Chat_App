@@ -264,9 +264,19 @@ const updateProfile = async(req,res)=>{
 
     const updateUser = await User.findByIdAndUpdate(
         req.user._id,
-        { $set: { username, email,bio } },
-        { new: true, runValidators: true }
-    ).select("-password -refreshToken")
+        { 
+            $set: 
+            { 
+                username, 
+                email,
+                bio 
+            } 
+        },
+        { 
+            new: true, 
+            runValidators: true 
+        }
+    )   .select("-password -refreshToken")
 
     return res
     .status(200)
