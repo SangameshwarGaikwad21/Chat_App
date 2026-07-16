@@ -83,7 +83,6 @@ const RegisterUser = async (req, res) => {
     }
 };
 
-
 const loginUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -152,7 +151,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 const logoutUser =async (req,res)=>{
 
   await User.findByIdAndUpdate(
@@ -209,8 +207,79 @@ const userProfile =async(req,res)=>{
     }
 }
 
+const updateUserAvatar = async(req,res)=>{
+    const avatarLocalPath = req.file?.path;
+
+    if(!avatarLocalPath){
+        return res
+        .status(400)
+        .json({
+            message:"Avatar not found"
+        })
+    }
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    
+    if(!avatar){
+        return res.status(500).json({
+            message:"Avatar upload Failed"
+        })
+    }
+
+    const userAvatar = await User.findByIdAndUpdate(
+        req.user._id,
+        { avatar: avatar.url },
+        { new: true }
+    ).select("-password");
+
+    return res
+        .status(200)
+        .json({
+            userAvatar,
+            message:"Avatar Updated Successfully"
+        }
+    );
+}
+
+
+const updateProfile = async(req,res)=>{
+
+    const {username,email} =req.body
+
+    if(!username || !email){
+        return res.status(400).json({
+            message:"All Fields are required"
+        })
+    }
+
+    const userExisted = await User.findOne({
+        _id: { $ne: req.user._id },
+        $or: [{ username }, { email }],
+    })
+
+    if(userExisted){
+        return res.status(401).json({
+            message:"Unauthorized User"
+        })
+    }
+
+    const updateUser = await User.findByIdAndUpdate(
+        req.user._id,
+        { $set: { username, email } },
+        { new: true, runValidators: true }
+    ).select("-password -refreshToken")
+
+    return res
+    .status(200)
+    .json({
+        updateUser,
+        message:"Account Updated Successfully"
+    })
+}
+
+
 export{
     RegisterUser,
     loginUser,
-    logoutUser,userProfile
+    logoutUser,userProfile,updateProfile,updateUserAvatar
 }
