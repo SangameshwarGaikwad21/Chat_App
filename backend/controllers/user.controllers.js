@@ -18,6 +18,7 @@ const generateAccessAndRefreshToken = async(userId)=>{
         return res
         .status(400)
         .json({
+            success: false,
             message:"User failed while generating accesstoken and refreshtoken"
         })    
     }
@@ -78,6 +79,7 @@ const RegisterUser = async (req, res) => {
 
     } catch (error) {
         return res.status(500).json({
+            success: false,
             message: error.message
         });
     }
@@ -202,7 +204,8 @@ const userProfile =async(req,res)=>{
         .status(500)
         .json({
             message:"User is not found",
-            error:error.message
+            error:error.message,
+            success: false
         })    
     }
 }

@@ -25,9 +25,9 @@ const messageSchema = new Schema(
             type: String,
             trim: true,
         },
-        isSeen:{
-            type:Boolean,
-            defulat:false
+       isSeen: {
+            type: Boolean,
+            default: false
         }
     },
     {

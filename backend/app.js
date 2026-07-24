@@ -4,6 +4,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes.js"
 import morgan from "morgan";
+import messageRoutes from "./routes/message.routes.js"
 
 config();
 
@@ -24,9 +25,14 @@ app.use(cookieParser())
 app.use(morgan("dev"));
 
 app.use("/api/v1/user",userRoutes)
+app.use("/api/v1/message",messageRoutes)
 
 app.get("/", (req, res) => {
   res.send("Backned running 🚀");
+});
+
+app.get("/socket", (req, res) => {
+    res.send("OK");
 });
 
 export default app;
