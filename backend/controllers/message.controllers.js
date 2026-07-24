@@ -50,6 +50,48 @@ const sendMessage = async (req, res) => {
     }
 };
 
+const getMessage =async(req,res) =>{
+    try {
+        const sender = req.user._id
+        const receiver = req.params.id
+
+        const conversation = await Conversation.findOne({
+            participants:{
+                $all: [sender, receiver]
+            }
+        })
+
+        if(!conversation){
+            return res
+            .status(400)
+            .json({
+                success: true,
+                messages: []
+            })
+        }
+
+        const messages = await Message.find({
+            conversation: conversation._id
+        })
+        .sort({ createdAt: 1 });
+
+        return res
+        .status(200)
+        .json({
+            success: true,
+            message: "Messages fetched successfully",
+            messages: messages
+        });
+    } 
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
 export {
-    sendMessage
+    sendMessage,
+    getMessage
 }
