@@ -91,7 +91,53 @@ const getMessage =async(req,res) =>{
     }
 }
 
+const deleteMessage =async(req,res)=>{
+    try {
+
+        const userId = req.user._id
+        const{ messageId } = req.params
+        
+        const message = await Message.findById(messageId)
+
+        if (!message) {
+            return res.status(404).json({
+                success: false,
+                message: "Message not found",
+            });
+        }
+
+        // Check if the logged-in user is the sender
+        if (message.sender.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to delete this message",
+            });
+        }
+
+        await Message.findByIdAndDelete(messageId)
+
+        return res
+        .status(200)
+        .json({
+            message:"Message Deleted Successfully",
+            success:true
+        })
+    } catch (error) {
+
+        console.log(error.message)
+
+        return res
+        .status(500)
+        .json({
+            message:"Failed to delete the message",
+            success:false
+        })
+    }
+}
+
+
 export {
     sendMessage,
-    getMessage
+    getMessage,
+    deleteMessage
 }
