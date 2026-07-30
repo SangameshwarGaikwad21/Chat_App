@@ -1,21 +1,21 @@
 import axiosInstance from "./axios"
 
-export const registerUser = async(data)=>{
+export const registerUserAPI = async(data)=>{
     const res = await axiosInstance.post("/user/register",data)
     return res.data
 }
 
-export const loginUser = async(data)=>{
+export const loginUserAPI = async(data)=>{
     const res = await axiosInstance.post("/user/login",data)
     return res.data
 }
 
-export const logout = async(data)=>{
+export const logoutAPI = async(data)=>{
     const res = await axiosInstance.post("/user/logout",data)
     return res.data
 }
 
-export const userProfile = async(data)=>{
-    const res = await axiosInstance.get("/user/me",data)
+export const userProfileAPI = async(data)=>{
+    const res = await axiosInstance.get("/user/me")
     return res.data
 }
