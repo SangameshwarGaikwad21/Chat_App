@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { registerUser } from "../../services/authService";
+import { registerUserAPI,loginUserAPI } from "../../services/authService";
+import toast from "react-hot-toast";
 
-export const registerUser = createAsyncThunk("/user/register",async(userData,thunkAPI)=>{
+export const registerUser = createAsyncThunk("auth/register",async(userData,thunkAPI)=>{
     try {
-        const response = await registerUser(userData)
+        const response = await registerUserAPI(userData)
+        console.log("User register:-",response)
+        toast.success("User Registered Successfully ✅");
         return response
-        console.log("User register",response)
     } 
     catch (error) {
         return thunkAPI.rejectWithValue(
@@ -14,12 +16,26 @@ export const registerUser = createAsyncThunk("/user/register",async(userData,thu
     }
 })
 
+export const loginUser = createAsyncThunk("auth/login",async(userData,thunkAPI)=>{
+    try {
+        const response = await loginUserAPI(userData)
+        console.log("Login User:-",response)
+        toast.success("User Login Done")
+        return response
+    } 
+    catch (error) {
+        return thunkAPI.rejectWithValue(
+            error.response?.data?.message || "User Login Failed"
+        )  
+    }
+})
+
 const initialState={
     user: null,
     loading: false,
     error: null,
     success: false,
-}
+}   
 
 const authSlice = createSlice({
     name:"auth",
@@ -33,19 +49,40 @@ const authSlice = createSlice({
     },
     extraReducers:(builder)=>{
         builder
+
+        // registerUser
         .addCase(registerUser.pending,(state)=>{
-            state.loading = false,
-            state.error = null
+            state.loading = true;
+            state.success = false;
+            state.error = null;
         })
         .addCase(registerUser.fulfilled,(state,action)=>{
-            state.loading = false,
-            state.success = true,
-            state.user = action.payload.user
+            state.loading = false;
+            state.success = true;
+            state.user = action.payload.data.user;
         })
         .addCase(registerUser.rejected,(state,action)=>{
-            state.loading = false,
+            state.loading = false;
+            state.error = action.payload;
+            state.success = false;
+        })
+
+        // loginUser
+        .addCase(loginUser.pending,(state)=>{
+            state.loading =true,
+            state.error= null
+        })
+        .addCase(loginUser.fulfilled,(state,action)=>{
+            state.loading = false;
+            state.success =true;
+            state.user = action.payload.data.user;
+        })
+        .addCase(loginUser.rejected,(state,action)=>{
+            state.loading =false,
             state.error = action.payload
         })
+
+        // logoutUser
     }
 })
 
