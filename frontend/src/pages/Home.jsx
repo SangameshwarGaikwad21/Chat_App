@@ -17,7 +17,6 @@ const Home = () => {
                <Link to="/login">
                      Login
                 </Link>
-               
             </div>
         </div>
     </div>
