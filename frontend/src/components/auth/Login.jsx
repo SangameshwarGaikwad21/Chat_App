@@ -8,7 +8,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { loginUser } from "../redux/auth/auth.slice";
+import { loginUser } from "../../redux/auth/auth.slice";
 
 const Login = () => {
   const dispatch = useDispatch();

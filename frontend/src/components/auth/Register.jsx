@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { registerUser } from "../redux/auth/auth.slice";
+import { registerUser } from "../../redux/auth/auth.slice";
 
 const Register = () => {
   const dispatch = useDispatch();
