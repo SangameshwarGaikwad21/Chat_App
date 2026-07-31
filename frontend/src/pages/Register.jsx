@@ -72,9 +72,15 @@ const Register = () => {
 
       toast.success("Account Created Successfully 🎉");
 
-      navigate("/");
+      navigate("/login");
     } catch (error) {
-      toast.error(error || "Registration Failed ❌");
+      console.log("Register Error:", error);
+
+      toast.error(
+        typeof error === "string"
+          ? error
+          : error?.message || "Registration Failed ❌"
+      );
     }
   };
 

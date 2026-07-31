@@ -5,8 +5,6 @@ import toast from "react-hot-toast";
 export const registerUser = createAsyncThunk("auth/register",async(userData,thunkAPI)=>{
     try {
         const response = await registerUserAPI(userData)
-        console.log("User register:-",response)
-        toast.success("User Registered Successfully ✅");
         return response
     } 
     catch (error) {
@@ -19,8 +17,6 @@ export const registerUser = createAsyncThunk("auth/register",async(userData,thun
 export const loginUser = createAsyncThunk("auth/login",async(userData,thunkAPI)=>{
     try {
         const response = await loginUserAPI(userData)
-        console.log("Login User:-",response)
-        toast.success("User Login Done")
         return response
     } 
     catch (error) {
@@ -59,7 +55,7 @@ const authSlice = createSlice({
         .addCase(registerUser.fulfilled,(state,action)=>{
             state.loading = false;
             state.success = true;
-            state.user = action.payload.data.user;
+            state.user = action.payload.user;
         })
         .addCase(registerUser.rejected,(state,action)=>{
             state.loading = false;
@@ -75,7 +71,7 @@ const authSlice = createSlice({
         .addCase(loginUser.fulfilled,(state,action)=>{
             state.loading = false;
             state.success =true;
-            state.user = action.payload.data.user;
+            state.user = action.payload.user;
         })
         .addCase(loginUser.rejected,(state,action)=>{
             state.loading =false,
