@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import { Search, Settings, LogOut, MessageCircleMore} from "lucide-react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const SidebarWrapper = () => {
+
+  const [activeTab, setActiveTab] = useState("Chats");
 
 
   return (
@@ -59,14 +62,65 @@ const SidebarWrapper = () => {
     </div>
 
     {/* Section Title */}
-    <div className="relative z-10 flex items-center justify-between px-6 pb-3">
-      <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
-        Chats
-      </h2>
+    <div className="relative z-10 px-6 pb-4">
+        <div className="relative flex rounded-xl bg-slate-900 p-1">
 
-    </div>
+          <button
+            onClick={() => setActiveTab("Chats")}
+            className="relative z-10 flex-1 py-2 text-sm font-medium"
+          >
+            {activeTab === "Chats" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 rounded-lg bg-cyan-500"
+                transition={{
+                  type: "spring",
+                  stiffness: 350,
+                  damping: 30,
+                }}
+              />
+            )}
 
+            <span
+              className={`relative ${
+                activeTab === "Chats"
+                  ? "text-white"
+                  : "text-slate-400"
+              }`}
+            >
+              Chats
+            </span>
+          </button>
 
+          <button
+            onClick={() => setActiveTab("Groups")}
+            className="relative z-10 flex-1 py-2 text-sm font-medium"
+          >
+            {activeTab === "Groups" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 rounded-lg bg-cyan-500"
+                transition={{
+                  type: "spring",
+                  stiffness: 350,
+                  damping: 30,
+                }}
+              />
+            )}
+
+            <span
+              className={`relative ${
+                activeTab === "Groups"
+                  ? "text-white"
+                  : "text-slate-400"
+              }`}
+            >
+              Groups
+            </span>
+          </button>
+
+        </div>
+      </div>
     <div className="relative z-10 flex flex-1 items-center justify-center px-6">
       <div className="text-center">
         <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-slate-800/70">

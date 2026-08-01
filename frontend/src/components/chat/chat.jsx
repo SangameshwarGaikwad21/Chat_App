@@ -4,9 +4,9 @@ import ChatMessage from './chatMessage'
 
 const Chat = () => {
   return (
-    <div>
+    <div className='flex'> 
         <SidebarWrapper />    
-       <ChatMessage />
+        <ChatMessage />
     </div>
   )
 }
