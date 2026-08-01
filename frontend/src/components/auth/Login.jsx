@@ -42,7 +42,8 @@ const Login = () => {
 
         toast.success("Login Successfully 🎉");
         console.log("Navigating...");
-        navigate("/");
+        navigate("/chat");
+        
     } catch (error) {
         console.log("Login Error:", error);
 
