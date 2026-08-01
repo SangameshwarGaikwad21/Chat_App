@@ -1,14 +1,9 @@
 import { motion } from "framer-motion";
-import {
-  Search,
-  Settings,
-  LogOut,
-  MessageCircleMore,
-} from "lucide-react";
+import { Search, Settings, LogOut, MessageCircleMore} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 
 const SidebarWrapper = () => {
 
-    
 
   return (
   <motion.aside
@@ -42,7 +37,10 @@ const SidebarWrapper = () => {
           <Settings size={20} />
         </button>
 
-        <button className="rounded-xl p-2 text-slate-400 transition-all duration-300 hover:bg-red-500/10 hover:text-red-400">
+        <button 
+          className="rounded-xl p-2 text-slate-400 transition-all duration-300 hover:bg-red-500/10 hover:text-red-400"
+          
+        >
           <LogOut size={20} />
         </button>
       </div>

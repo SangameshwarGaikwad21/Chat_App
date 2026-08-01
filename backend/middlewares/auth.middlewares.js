@@ -1,35 +1,50 @@
 import JWT from "jsonwebtoken"
 import {User} from "../models/user.model.js"
 
-export const VerifyJWT =async(req,res,next)=>{
+export const VerifyJWT = async (req, res, next) => {
     try {
 
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+        console.log("============== VERIFY JWT ==============");
+        console.log("req.cookies :", req.cookies);
+        console.log("req.headers.cookie :", req.headers.cookie);
 
-        if(!token){
+        const token =
+            req.cookies?.accessToken ||
+            req.header("Authorization")?.replace("Bearer ", "");
+
+        console.log("TOKEN =>", token);
+
+        if (!token) {
             return res.status(401).json({
-                message:"Unauthorized Request"
-            })
+                success: false,
+                message: "Unauthorized Request",
+            });
         }
 
-        const decodedToken =JWT.verify(token,process.env.ACCESS_TOKEN_SECRET)
+        const decoded = JWT.verify(
+            token,
+            process.env.ACCESS_TOKEN_SECRET
+        );
 
-        const user = await User.findById(decodedToken?._id)
-        .select("-password -refreshToken");
+        console.log("Decoded:", decoded);
 
-        if (!user) {
-            throw new ApiError(401, "Invalid Access Token");
-        }
+        const user = await User.findById(decoded._id)
+            .select("-password -refreshToken");
+
+        console.log("User:", user);
 
         req.user = user;
+
         next();
-        
-    } 
-    catch (error) {
-        return res
-        .status(500)
-        .json({
-            message:"Failed while generate the VerifyJWT Token"
-        })    
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(401).json({
+            success: false,
+            message: err.message,
+        });
+
     }
-}
+};

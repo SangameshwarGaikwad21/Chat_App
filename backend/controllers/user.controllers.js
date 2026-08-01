@@ -166,21 +166,23 @@ const logoutUser =async (req,res)=>{
             new: true
         }
     );
-
-     const options = {
-        httpOnly: true,
-        secure: true
+    
+    const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite:
+        process.env.NODE_ENV === "production" ? "none" : "lax",
     };
 
     return res
-        .status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
-        .json({
-          success: true,
-          message: "User logout in successfully."
-      });
-}
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
+    .status(200)
+    .json({
+        success: true,
+        message: "User logged out successfully.",
+    });
+    }
 
 const userProfile =async(req,res)=>{
     try {

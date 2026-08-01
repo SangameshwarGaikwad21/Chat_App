@@ -1,12 +1,12 @@
 import React from 'react'
 import SidebarWrapper from '../sidebar/sidebarWrapper'
-// import ChatMessage from './chatMessage'
+import ChatMessage from './chatMessage'
 
 const Chat = () => {
   return (
     <div>
         <SidebarWrapper />    
-       {/* <ChatMessage />*/}
+       <ChatMessage />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { registerUserAPI,loginUserAPI } from "../../services/authService";
+import { registerUserAPI,loginUserAPI,logoutAPI } from "../../services/authService";
 import toast from "react-hot-toast";
 
 export const registerUser = createAsyncThunk("auth/register",async(userData,thunkAPI)=>{
@@ -26,11 +26,12 @@ export const loginUser = createAsyncThunk("auth/login",async(userData,thunkAPI)=
     }
 })
 
-const initialState={
+const initialState = {
     user: null,
     loading: false,
     error: null,
     success: false,
+    isAuthenticated: false,
 }   
 
 const authSlice = createSlice({
@@ -45,7 +46,6 @@ const authSlice = createSlice({
     },
     extraReducers:(builder)=>{
         builder
-
         // registerUser
         .addCase(registerUser.pending,(state)=>{
             state.loading = true;
@@ -79,9 +79,9 @@ const authSlice = createSlice({
         })
 
         // logoutUser
-        
+
     }
-})
+}) 
 
 export const {resetState} = authSlice.actions;
 
