@@ -28,7 +28,7 @@ export default function Chat() {
       <div className="flex h-screen bg-[#0B1120]">
         <SidebarWrapper />
 
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
           <ChatWindow />
         </div>
       </div>

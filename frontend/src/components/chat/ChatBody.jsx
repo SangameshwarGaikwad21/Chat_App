@@ -1,13 +1,28 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import { MessageCircleMore } from "lucide-react";
 import { useSelector } from "react-redux";
+import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
 
 export default function ChatBody() {
+
+
+  const bottomRef = useRef(null);
+
   const { messages, loading } = useSelector((state) => state.message);
   const { user } = useSelector((state) => state.auth);
+
+
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
 
   if (loading) {
     return (
@@ -17,12 +32,18 @@ export default function ChatBody() {
     );
   }
 
+  
+
+
+  console.log("User:", user);
+console.log("Messages:", messages);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative flex-1 overflow-y-auto bg-[#020817] p-6"
+      className="relative flex-1 overflow-y-auto bg-[#020817] p-6 pb-32"
     >
       {/* Background Glow */}
       <div className="absolute inset-0 overflow-hidden">
@@ -32,25 +53,29 @@ export default function ChatBody() {
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-4">
-        {messages.length > 0 ? (
-          messages.map((message) => {
-            const isMe = message.sender === user?._id;
+  {messages.length > 0 ? (
+    <>
+      {messages.map((message) => {
+        const isMe = message.sender === user?._id;
 
-            return (
-              <div
-                key={message._id}
-                className={`flex ${
-                  isMe ? "justify-end" : "justify-start"
-                }`}
-              >
-                <MessageBubble
-                  message={message}
-                  isMe={isMe}
-                />
-              </div>
-            );
-          })
-        ) : (
+        return (
+          <div
+            key={message._id}
+            className={`flex ${
+              isMe ? "justify-end" : "justify-start"
+            }`}
+          >
+            <MessageBubble
+              message={message}
+              isMe={isMe}
+            />
+          </div>
+        );
+      })}
+
+      <div ref={bottomRef} />
+    </>
+  ) :  (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
