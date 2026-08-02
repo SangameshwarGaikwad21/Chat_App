@@ -1,14 +1,16 @@
-import React from 'react'
-import SidebarWrapper from '../sidebar/sidebarWrapper'
-import ChatMessage from './chatMessage'
+import SidebarWrapper from "../sidebar/sidebarWrapper";
+import ChatWindow from "./ChatWindow";
 
 const Chat = () => {
   return (
-    <div className='flex'> 
-        <SidebarWrapper />    
-        <ChatMessage />
-    </div>
-  )
-}
+    <div className="flex h-screen w-full bg-[#0B1120]">
+      <SidebarWrapper />
 
-export default Chat
+      <div className="flex-1">
+        <ChatWindow />
+      </div>
+    </div>
+  );
+};
+
+export default Chat;
