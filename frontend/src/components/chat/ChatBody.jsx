@@ -1,37 +1,55 @@
 "use client";
 
 import { motion } from "framer-motion";
-import MessageBubble from "./MessageBubble";
 import { MessageCircleMore } from "lucide-react";
-
-const messages= [];
+import { useSelector } from "react-redux";
+import MessageBubble from "./MessageBubble";
 
 export default function ChatBody() {
+  const { messages, loading } = useSelector((state) => state.message);
+  const { user } = useSelector((state) => state.auth);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="
-        relative
-        flex-1
-        overflow-y-auto
-        bg-[#020817]
-        p-6
-      "
+      className="relative flex-1 overflow-y-auto bg-[#020817] p-6"
     >
       {/* Background Glow */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 left-20 h-96 w-96 rounded-full bg-cyan-500/10 blur-[140px]" />
         <div className="absolute bottom-0 right-10 h-96 w-96 rounded-full bg-blue-600/10 blur-[140px]" />
         <div className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/5 blur-[180px]" />
-    </div>
+      </div>
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-4">
         {messages.length > 0 ? (
-          messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
-          ))
+          messages.map((message) => {
+            const isMe = message.sender === user?._id;
+
+            return (
+              <div
+                key={message._id}
+                className={`flex ${
+                  isMe ? "justify-end" : "justify-start"
+                }`}
+              >
+                <MessageBubble
+                  message={message}
+                  isMe={isMe}
+                />
+              </div>
+            );
+          })
         ) : (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 30 }}

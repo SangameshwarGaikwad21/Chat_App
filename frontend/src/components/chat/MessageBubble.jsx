@@ -1,11 +1,11 @@
-"use client";
-
+import { useSelector } from "react-redux";
 import { CheckCheck } from "lucide-react";
 
-export default function MessageBubble({
-  message,
-}) {
-  const isMe = message.sender === "me";
+export default function MessageBubble({ message }) {
+  const { user } = useSelector((state) => state.auth);
+
+  const isMe =
+  message.sender?.toString() === user?._id?.toString();
 
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
@@ -19,7 +19,12 @@ export default function MessageBubble({
         <p>{message.text}</p>
 
         <div className="mt-2 flex items-center justify-end gap-1 text-xs opacity-70">
-          <span>{message.time}</span>
+          <span>
+            {new Date(message.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
 
           {isMe && <CheckCheck size={14} />}
         </div>

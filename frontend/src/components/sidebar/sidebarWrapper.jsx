@@ -1,17 +1,28 @@
 "use client";
-
 import { motion } from "framer-motion";
-import {
-  Search,
-  Settings,
-  LogOut,
-  MessageCircleMore,
-  X,
-} from "lucide-react";
-import { useState } from "react";
+import {Search,Settings,LogOut,MessageCircleMore,X,} from "lucide-react";
+import { useEffect, useState } from "react";
+import { getConversations,setSelectedConversation } from "../../redux/auth/conversation.slice";
+import { useDispatch,useSelector } from "react-redux";
+import {getMessages} from "../../redux/auth/message.slice";
+
 
 const SidebarWrapper = ({ closeSidebar }) => {
   const [activeTab, setActiveTab] = useState("Chats");
+
+
+  const dispatch = useDispatch();
+  const { conversations, loading, error,selectedConversation  } = useSelector((state) => state.conversation);
+
+  useEffect(() => {
+    dispatch(getConversations());
+  }, [dispatch]);
+
+
+  const handleConversationClick = (chat) => {
+      dispatch(setSelectedConversation(chat));
+      dispatch(getMessages(chat.user._id));
+  };
 
   return (
     <motion.aside
@@ -139,24 +150,71 @@ const SidebarWrapper = ({ closeSidebar }) => {
       </div>
 
       {/* Empty State */}
-      <div className="relative z-10 flex flex-1 items-center justify-center px-6">
-        <div className="text-center">
-          <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-slate-800/70">
-            <MessageCircleMore
-              size={42}
-              className="text-slate-500"
-            />
+      <div className="relative z-10 flex-1 overflow-y-auto px-3 pb-4">
+            {loading ? (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-slate-400">Loading...</p>
+              </div>
+            ) : conversations.length > 0 ? (
+              conversations.map((chat) => (
+                <div
+                  key={chat._id}
+                  onClick={() => handleConversationClick(chat)}
+                  className={`mb-2 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition
+                    ${
+                     selectedConversation?._id === chat._id
+                        ? "bg-cyan-600/20 border border-cyan-500"
+                        : "hover:bg-slate-800"
+                    }`}
+                >
+                 <div className="relative">
+                      <img
+                        src={chat.user?.avatar || "/avatar.png"}
+                        alt={chat.user?.username}
+                        className="h-12 w-12 rounded-full object-cover"
+                      />
+
+                      <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#0B1120] bg-green-500" />
+                    </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                        <h3 className="truncate font-medium text-white">
+                          {chat.user?.username}
+                        </h3>
+
+                        <span className="text-xs text-slate-500">
+                          {new Date(chat.updatedAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+
+                      <p className="truncate text-sm text-slate-400">
+                        {chat.lastMessage?.text || "Start chatting..."}
+                      </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <div className="text-center">
+                  <MessageCircleMore
+                    size={40}
+                    className="mx-auto mb-3 text-slate-500"
+                  />
+
+                  <h3 className="text-lg font-semibold text-white">
+                    No Conversations Yet
+                  </h3>
+
+                  <p className="mt-2 text-sm text-slate-500">
+                    Search for a user and start chatting.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
-
-          <h3 className="text-lg font-semibold text-white">
-            No Conversations Yet
-          </h3>
-
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Search for a user and start your first conversation.
-          </p>
-        </div>
-      </div>
     </motion.aside>
   );
 };

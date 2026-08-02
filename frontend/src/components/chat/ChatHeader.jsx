@@ -2,8 +2,17 @@
 
 import { motion } from "framer-motion";
 import { Phone, Video, MoreVertical } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function ChatHeader() {
+
+  const dispatch = useDispatch();
+
+  const { selectedConversation } = useSelector(
+  (state) => state.conversation
+);
+
+
   return (
     <motion.header
       initial={{ y: -30, opacity: 0 }}
@@ -32,7 +41,7 @@ export default function ChatHeader() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <h2 className="font-semibold text-white">Someone Name</h2>
+          <h2 className="font-semibold text-white text-xl">{selectedConversation?.user?.username}</h2>
 
           <div className="mt-1 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-green-500" />

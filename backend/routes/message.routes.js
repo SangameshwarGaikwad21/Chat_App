@@ -5,8 +5,10 @@ import { upload } from "../middlewares/multer.middlewares.js";
 
 const router = Router()
 
-router.route("/send-message/:id").post(VerifyJWT,upload.single("image"),sendMessage)
-router.route("/:id").get(VerifyJWT,getMessage)
-router.route("/:messageId").delete(VerifyJWT,deleteMessage)
+router.post("/send-message/:receiverId", VerifyJWT, upload.single("image"), sendMessage);
+
+router.get("/:receiverId", VerifyJWT, getMessage);
+
+router.delete("/:messageId", VerifyJWT, deleteMessage);
 
 export default router;
