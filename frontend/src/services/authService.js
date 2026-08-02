@@ -11,16 +11,13 @@ export const loginUserAPI = async(data)=>{
 }
 
 export const logoutAPI = async () => {
-  const res = await axiosInstance.post(
-    "/user/logout",
-    {},
-    {
+  const res = await axiosInstance.post("/user/logout",{},{
       withCredentials: true,
     }
   );
-
   return res.data;
 };
+
 
 export const userProfileAPI = async(data)=>{
     const res = await axiosInstance.get("/user/me")

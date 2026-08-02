@@ -1,16 +1,52 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import SidebarWrapper from "../sidebar/sidebarWrapper";
 import ChatWindow from "./ChatWindow";
 
-const Chat = () => {
-  return (
-    <div className="flex h-screen w-full bg-[#0B1120]">
-      <SidebarWrapper />
+export default function Chat() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(false);
 
-      <div className="flex-1">
-        <ChatWindow />
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreen();
+
+    window.addEventListener("resize", checkScreen);
+
+    return () => {
+      window.removeEventListener("resize", checkScreen);
+    };
+  }, []);
+
+  // Desktop
+  if (!isMobile) {
+    return (
+      <div className="flex h-screen bg-[#0B1120]">
+        <SidebarWrapper />
+
+        <div className="flex-1">
+          <ChatWindow />
+        </div>
       </div>
+    );
+  }
+
+  // Mobile
+  return (
+    <div className="h-screen bg-[#0B1120]">
+      {!selectedChat ? (
+        <SidebarWrapper
+          onSelectChat={() => setSelectedChat(true)}
+        />
+      ) : (
+        <ChatWindow
+          goBack={() => setSelectedChat(false)}
+        />
+      )}
     </div>
   );
-};
-
-export default Chat;
+}

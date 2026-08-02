@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes.js"
 import morgan from "morgan";
 import messageRoutes from "./routes/message.routes.js"
+import conversationRoutes from "./routes/conversation.routes.js"
 
 config();
 
@@ -26,6 +27,7 @@ app.use(morgan("dev"));
 
 app.use("/api/v1/user",userRoutes)
 app.use("/api/v1/message",messageRoutes)
+app.use("/api/v1/conversation",conversationRoutes)
 
 app.get("/", (req, res) => {
   res.send("Backned running 🚀");
