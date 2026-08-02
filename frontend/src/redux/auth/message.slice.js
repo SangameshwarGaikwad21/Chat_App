@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getMessagesAPI } from "../../services/message.service";
+import { getMessagesAPI, sendMessageAPI } from "../../services/message.service";
 
 export const getMessages = createAsyncThunk(
   "message/getMessages",
@@ -18,6 +18,22 @@ export const getMessages = createAsyncThunk(
     }
   }
 );
+
+export const sendMessage = createAsyncThunk(
+  "message/sendMessage",
+  async ({ receiverId, text }, thunkAPI) => {
+    try {
+      const response = await sendMessageAPI(receiverId, text);
+      toast.success("Message sent successfully");
+      return response.message;
+    } 
+    catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Sending Message Failed"
+      );
+    }
+  }
+)
 
 const initialState = {
   messages: [],
@@ -56,6 +72,22 @@ const messageSlice = createSlice({
         state.success = false;
         state.error = action.payload;
       });
+
+    builder 
+      .addCase(sendMessage.pending,(state)=>{
+        state.loading = true;
+        state.success = false;
+      })
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.messages.push(action.payload);
+      })
+      .addCase(sendMessage.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      })
   },
 });
 

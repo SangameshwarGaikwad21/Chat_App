@@ -3,7 +3,7 @@ import React from 'react'
 const ChatMessage = () => {
   return (
     <div className=''>
-        helo
+        he
     </div>
   )
 }

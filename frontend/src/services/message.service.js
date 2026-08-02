@@ -2,7 +2,7 @@ import axiosInstance from "./axios";
 
 export const sendMessageAPI = async (receiverId, messageData) => {
     const response = await axiosInstance.post(
-        `/api/messages/send-message/${receiverId}`,
+        `/message/send-message/${receiverId}`,
         messageData
     );
 
@@ -19,7 +19,7 @@ export const getMessagesAPI = async (receiverId) => {
 
 export const deleteMessageAPI = async (messageId) => {
     const response = await axiosInstance.delete(
-        `/api/messages/${messageId}`
+        `/message/${messageId}`
     );
 
     return response.data;
