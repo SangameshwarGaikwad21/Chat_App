@@ -14,6 +14,8 @@ export default function ChatBody() {
   const { messages, loading } = useSelector((state) => state.message);
   const { user } = useSelector((state) => state.auth);
 
+console.log("Auth State:", user);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",

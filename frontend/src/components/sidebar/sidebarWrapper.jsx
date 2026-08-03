@@ -20,11 +20,9 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
 
   const handleConversationClick = (chat) => {
-  console.log("CLICKED CHAT:", chat);
 
   dispatch(setSelectedConversation(chat));
 
-  console.log("Dispatching getMessages with:", chat.user._id);
 
   dispatch(getMessages(chat.user._id));
 };

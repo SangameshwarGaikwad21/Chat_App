@@ -12,7 +12,6 @@ export const getMessagesAPI = async (receiverId) => {
     const response = await axiosInstance.get(
         `/message/${receiverId}`
     );
-    console.log("Axios response.data:", response.data);
     return response.data;
 };
 

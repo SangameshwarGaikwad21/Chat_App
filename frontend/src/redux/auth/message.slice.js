@@ -5,12 +5,9 @@ import { getMessagesAPI, sendMessageAPI } from "../../services/message.service";
 export const getMessages = createAsyncThunk(
   "message/getMessages",
   async (receiverId, thunkAPI) => {
-    console.log("Thunk receiverId:", receiverId);
 
     try {
       const response = await getMessagesAPI(receiverId);
-
-      console.log("GET Response:", JSON.stringify(response, null, 2));
 
       toast.success("Messages fetched successfully");
 

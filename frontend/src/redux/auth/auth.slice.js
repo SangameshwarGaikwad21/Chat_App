@@ -83,7 +83,7 @@ const authSlice = createSlice({
         })
 
         // logoutUser
-
+        
     }
 }) 
 
