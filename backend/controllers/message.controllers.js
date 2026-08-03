@@ -6,7 +6,7 @@ const sendMessage = async (req, res) => {
     try {
 
         const sender = req.user._id;
-        const receiver = req.params.id;
+        const receiver = req.params.receiverId;
 
         const { text, image } = req.body;
 
@@ -41,55 +41,62 @@ const sendMessage = async (req, res) => {
         });
 
     } catch (error) {
+        console.error(error);
+        console.log("===== SEND MESSAGE ERROR =====");
+        console.error(error);
+        console.log("==============================");
+
 
         return res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
+};
+
+const getMessage = async (req, res) => {
+    console.log("🔥 GET MESSAGE CONTROLLER HIT");
+  try {
+    const sender = req.user._id;
+    const receiver = req.params.receiverId;
+
+    console.log("========== GET MESSAGE ==========");
+    console.log("Sender:", sender);
+    console.log("Receiver:", receiver);
+
+    const conversation = await Conversation.findOne({
+    participants: {
+        $all: [sender, receiver],
+    },
+    });
+
+    console.log("Conversation Found:", conversation);
+
+    if (!conversation) {
+      return res.status(200).json({
+        success: true,
+        messages: [],
+      });
+    }
+
+    const messages = await Message.find({
+      conversation: conversation._id,
+    }).sort({ createdAt: 1 });
+
+    console.log("Messages:", messages);
+
+    return res.status(200).json({
+      success: true,
+      messages,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
-
-const getMessage =async(req,res) =>{
-    try {
-        const sender = req.user._id
-        const receiver = req.params.id
-
-        const conversation = await Conversation.findOne({
-            participants:{
-                $all: [sender, receiver]
-            }
-        })
-
-        if(!conversation){
-            return res
-            .status(400)
-            .json({
-                success: true,
-                messages: []
-            })
-        }
-
-        const messages = await Message.find({
-            conversation: conversation._id
-        })
-        .sort({ createdAt: 1 });
-
-        return res
-        .status(200)
-        .json({
-            success: true,
-            message: "Messages fetched successfully",
-            messages: messages
-        });
-    } 
-    catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-}
 
 const deleteMessage =async(req,res)=>{
     try {

@@ -4,9 +4,8 @@ import { CheckCheck } from "lucide-react";
 export default function MessageBubble({ message }) {
   const { user } = useSelector((state) => state.auth);
 
-  const isMe =
-  message.sender?.toString() === user?._id?.toString();
-
+  const isMe = message.sender?._id === user?._id || message.sender === user?._id;
+  
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
       <div

@@ -9,13 +9,10 @@ import MessageBubble from "./MessageBubble";
 
 export default function ChatBody() {
 
-
   const bottomRef = useRef(null);
 
   const { messages, loading } = useSelector((state) => state.message);
   const { user } = useSelector((state) => state.auth);
-
-
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -30,20 +27,14 @@ export default function ChatBody() {
         Loading...
       </div>
     );
-  }
-
-  
-
-
-  console.log("User:", user);
-console.log("Messages:", messages);
+  }  
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative flex-1 overflow-y-auto bg-[#020817] p-6 pb-32"
+      className="relative flex-1 h-full overflow-y-auto bg-[#020817] p-6 pb-32"
     >
       {/* Background Glow */}
       <div className="absolute inset-0 overflow-hidden">
@@ -56,7 +47,12 @@ console.log("Messages:", messages);
   {messages.length > 0 ? (
     <>
       {messages.map((message) => {
-        const isMe = message.sender === user?._id;
+        const senderId =
+          typeof message.sender === "object"
+            ? message.sender._id
+            : message.sender;
+
+        const isMe = String(senderId) === String(user?._id);
 
         return (
           <div

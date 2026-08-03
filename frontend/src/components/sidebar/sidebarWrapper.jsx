@@ -20,9 +20,14 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
 
   const handleConversationClick = (chat) => {
-      dispatch(setSelectedConversation(chat));
-      dispatch(getMessages(chat.user._id));
-  };
+  console.log("CLICKED CHAT:", chat);
+
+  dispatch(setSelectedConversation(chat));
+
+  console.log("Dispatching getMessages with:", chat.user._id);
+
+  dispatch(getMessages(chat.user._id));
+};
 
   return (
     <motion.aside
