@@ -12,9 +12,11 @@ export default function ChatBody() {
   const bottomRef = useRef(null);
 
   const { messages, loading } = useSelector((state) => state.message);
+  const auth = useSelector((state) => state.auth);
+
   const { user } = useSelector((state) => state.auth);
 
-console.log("Auth State:", user);
+  console.log("Full Auth State:", auth);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({

@@ -16,6 +16,8 @@ const Login = () => {
 
   const { loading } = useSelector((state) => state.auth);
 
+  
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -38,12 +40,13 @@ const Login = () => {
     }
 
     try {
-      await dispatch(loginUser(form)).unwrap();
+      const result = await dispatch(loginUser(form)).unwrap();
+      console.log("Login Result:", result);
+      toast.success("Login Successfully 🎉");
 
-        toast.success("Login Successfully 🎉");
-        console.log("Navigating...");
+      setTimeout(() => {
         navigate("/chat");
-        
+      }, 1000);
     } catch (error) {
         console.log("Login Error:", error);
 

@@ -5,9 +5,6 @@ export default function MessageBubble({ message }) {
   const { user } = useSelector((state) => state.auth);
 
   const isMe = message.sender?._id === user?._id || message.sender === user?._id;
-
-  console.log("Logged User:", user?._id);
-
   
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
