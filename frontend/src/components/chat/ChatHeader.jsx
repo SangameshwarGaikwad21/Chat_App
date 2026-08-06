@@ -2,11 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Phone, Video, MoreVertical } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function ChatHeader() {
-
-  const dispatch = useDispatch();
 
   const { selectedConversation } = useSelector(
   (state) => state.conversation
@@ -23,7 +21,7 @@ export default function ChatHeader() {
       {/* Left Side */}
       <div className="flex items-center gap-4">
         <motion.img
-          src="#"
+          src={selectedConversation?.user?.avatar || "/avatar.png"}
           alt="profile"
           className="h-11 w-11 rounded-full border-2 border-cyan-500 object-cover"
           initial={{ scale: 0 }}

@@ -72,7 +72,7 @@ const Register = () => {
 
       toast.success("Account Created Successfully 🎉");
 
-      navigate("/chat");
+      navigate("/login");
     } catch (error) {
       console.log("Register Error:", error);
 

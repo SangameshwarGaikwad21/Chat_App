@@ -1,10 +1,10 @@
-import React from 'react'
 import { Routes,Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home'
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Chat from './components/chat/chat';
+import Profile from './components/auth/Profile';
 
 const App = () => {
   return (
@@ -15,6 +15,7 @@ const App = () => {
         <Route path='/register' element={<Register/>}/>
         <Route path='/login' element={<Login/>} />
         <Route path='/chat' element={<Chat/>} />
+        <Route path='/profile' element={<Profile/>} />
       </Routes>
     </div>
   )

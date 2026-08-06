@@ -5,14 +5,19 @@ import { useEffect, useState } from "react";
 import { getConversations,setSelectedConversation } from "../../redux/auth/conversation.slice";
 import { useDispatch,useSelector } from "react-redux";
 import {getMessages} from "../../redux/auth/message.slice";
+import { useNavigate } from "react-router-dom";
+
 
 
 const SidebarWrapper = ({ closeSidebar }) => {
   const [activeTab, setActiveTab] = useState("Chats");
 
+  const { user } = useSelector((state) => state.auth);
+
+const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const { conversations, loading, error,selectedConversation  } = useSelector((state) => state.conversation);
+  const { conversations, loading, selectedConversation } = useSelector((state) => state.conversation);
 
   useEffect(() => {
     dispatch(getConversations());
@@ -25,6 +30,7 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
 
   dispatch(getMessages(chat.user._id));
+  closeSidebar?.();
 };
 
   return (
@@ -62,24 +68,28 @@ const SidebarWrapper = ({ closeSidebar }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Close button (Mobile Only) */}
-          <button
-            onClick={closeSidebar}
-            className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white md:hidden"
-          >
-            <X size={20} />
-          </button>
 
-          <button className="hidden rounded-xl p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white md:block">
-            <Settings size={20} />
-          </button>
+            {/* Profile */}
+            <button
+              onClick={() => navigate("/profile")}
+              className="rounded-full transition hover:scale-105"
+            >
+              <img
+                src={user?.avatar || "/avatar.png"}
+                alt={user?.username || "User"}
+                className="h-10 w-10 rounded-full border-2 border-cyan-500 object-cover"
+              />
+            </button>
 
-          <button className="hidden rounded-xl p-2 text-slate-400 transition hover:bg-red-500/10 hover:text-red-400 md:block">
-            <LogOut size={20} />
-          </button>
-        </div>
+            {/* Logout */}
+            <button
+              className="rounded-xl p-2 text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
+            >
+              <LogOut size={20} />
+            </button>
+
+          </div>
       </div>
-
       {/* Search */}
       <div className="relative z-10 p-5">
         <div className="flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-3 backdrop-blur-xl">

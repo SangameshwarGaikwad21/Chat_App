@@ -20,7 +20,10 @@ export const logoutAPI = async () => {
 };
 
 
-export const userProfileAPI = async(data)=>{
-    const res = await axiosInstance.get("/user/me")
-    return res.data
-}
+export const userProfileAPI = async () => {
+    const res = await axiosInstance.get("/user/me", {
+        withCredentials: true,
+    });
+
+    return res.data;
+};

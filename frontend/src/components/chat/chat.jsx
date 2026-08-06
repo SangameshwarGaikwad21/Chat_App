@@ -40,11 +40,11 @@ export default function Chat() {
     <div className="h-screen bg-[#0B1120]">
       {!selectedChat ? (
         <SidebarWrapper
-          onSelectChat={() => setSelectedChat(true)}
+          closeSidebar={() => setSelectedChat(true)}
         />
       ) : (
         <ChatWindow
-          goBack={() => setSelectedChat(false)}
+          openSidebar={() => setSelectedChat(false)}
         />
       )}
     </div>
