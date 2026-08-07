@@ -24,6 +24,30 @@ export default function ChatBody() {
   }, [messages]);
 
 
+  const formatDate = (date) => {
+    const today = new Date();
+    const yesterday = new Date();
+
+    yesterday.setDate(today.getDate() - 1);
+
+    const messageDate = new Date(date);
+
+    if (messageDate.toDateString() === today.toDateString()) {
+        return "Today";
+    }
+
+    if (messageDate.toDateString() === yesterday.toDateString()) {
+        return "Yesterday";
+    }
+
+    return messageDate.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+};
+
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center text-white">
@@ -49,28 +73,48 @@ export default function ChatBody() {
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-4">
   {messages.length > 0 ? (
     <>
-      {messages.map((message) => {
-        const senderId =
-          typeof message.sender === "object"
+     {messages.map((message, index) => {
+    const senderId =
+        typeof message.sender === "object"
             ? message.sender._id
             : message.sender;
 
-        const isMe = String(senderId) === String(user?._id);
+    const isMe = String(senderId) === String(user?._id);
 
-        return (
-          <div
-            key={message._id}
-            className={`flex ${
-              isMe ? "justify-end" : "justify-start"
-            }`}
-          >
-            <MessageBubble
-              message={message}
-              isMe={isMe}
-            />
-          </div>
-        );
-      })}
+    const currentDate = formatDate(message.createdAt);
+
+    const previousDate =
+        index > 0
+            ? formatDate(messages[index - 1].createdAt)
+            : null;
+
+    const showDate = currentDate !== previousDate;
+
+    return (
+        <div key={message._id}>
+            {/* Date Separator */}
+            {showDate && (
+                <div className="my-6 flex justify-center">
+                    <span className="rounded-full bg-slate-800 px-4 py-2 text-xs font-medium text-slate-300 shadow">
+                        {currentDate}
+                    </span>
+                </div>
+            )}
+
+            {/* Message */}
+            <div
+                className={`flex ${
+                    isMe ? "justify-end" : "justify-start"
+                }`}
+            >
+                <MessageBubble
+                    message={message}
+                    isMe={isMe}
+                />
+            </div>
+        </div>
+    );
+})}
 
       <div ref={bottomRef} />
     </>

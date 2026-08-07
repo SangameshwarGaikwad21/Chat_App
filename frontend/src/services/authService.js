@@ -21,9 +21,17 @@ export const logoutAPI = async () => {
 
 
 export const userProfileAPI = async () => {
-    const res = await axiosInstance.get("/user/me", {
-        withCredentials: true,
-    });
-
-    return res.data;
+    try {
+        console.log("Calling profile API");
+        
+        const res = await axiosInstance.get("/user/me", {
+            withCredentials: true,
+        });
+        console.log("Profile Response:", res.data);
+        
+        return res.data;
+    } catch (error) {
+        console.log("Profile Error:", error.response);
+        throw error;
+    }
 };

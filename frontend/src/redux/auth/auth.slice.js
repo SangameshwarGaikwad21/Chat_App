@@ -31,6 +31,8 @@ export const getUserProfile = createAsyncThunk(
         try {
             const response = await userProfileAPI();
 
+             console.log("Thunk Response:", response);
+
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -43,7 +45,7 @@ export const getUserProfile = createAsyncThunk(
 
 const initialState = {
     user: null,
-    loading: false,
+    loading: true,
     error: null,
     success: false,
     isAuthenticated: false,
@@ -54,9 +56,9 @@ const authSlice = createSlice({
     initialState,
     reducers:{
         resetState:(state)=>{
-            state.loading = false,
-            state.success=false,
-            state.error = null
+            state.loading = false;
+            state.success=false;
+            state.error = null;
         }
     },
     extraReducers:(builder)=>{
@@ -71,6 +73,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.success = true;
             state.user = action.payload.user;
+            state.isAuthenticated = true;
         })
         .addCase(registerUser.rejected,(state,action)=>{
             state.loading = false;
@@ -85,8 +88,6 @@ const authSlice = createSlice({
             state.error = null;
         })
        .addCase(loginUser.fulfilled, (state, action) => {
-            console.log("🔥 Reducer Fired");
-            console.log(action.payload);
 
             state.loading = false;
             state.success = true;
@@ -107,6 +108,7 @@ const authSlice = createSlice({
             state.loading = true;
         })
         .addCase(getUserProfile.fulfilled, (state, action) => {
+            console.log("Response:-",action.payload)
             state.loading = false;
             state.user = action.payload.user;
             state.isAuthenticated = true;
