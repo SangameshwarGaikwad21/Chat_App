@@ -31,8 +31,6 @@ export const getUserProfile = createAsyncThunk(
         try {
             const response = await userProfileAPI();
 
-            console.log(response);
-
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -106,24 +104,20 @@ const authSlice = createSlice({
 
         // getUserProfile
         .addCase(getUserProfile.pending, (state) => {
-    state.loading = true;
-})
-
-.addCase(getUserProfile.fulfilled, (state, action) => {
-    console.log(action.payload);
-
-    state.loading = false;
-    state.user = action.payload.user;
-    state.isAuthenticated = true;
-    state.error = null;
-})
-
-.addCase(getUserProfile.rejected, (state, action) => {
-    state.loading = false;
-    state.user = null;
-    state.isAuthenticated = false;
-    state.error = action.payload;
-})
+            state.loading = true;
+        })
+        .addCase(getUserProfile.fulfilled, (state, action) => {
+            state.loading = false;
+            state.user = action.payload.user;
+            state.isAuthenticated = true;
+            state.error = null;
+        })
+        .addCase(getUserProfile.rejected, (state, action) => {
+            state.loading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+            state.error = action.payload;
+        })
     }
 }) 
 

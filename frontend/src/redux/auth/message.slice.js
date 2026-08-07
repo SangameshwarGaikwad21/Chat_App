@@ -8,13 +8,10 @@ export const getMessages = createAsyncThunk(
 
     try {
       const response = await getMessagesAPI(receiverId);
-
-      toast.success("Messages fetched successfully");
-
       return response.messages;
-    } catch (error) {
+    } 
+    catch (error) {
       console.log("GET Error:", error);
-
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Fetching Messages Failed"
       );
