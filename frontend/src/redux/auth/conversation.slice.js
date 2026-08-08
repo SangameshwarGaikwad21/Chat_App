@@ -7,8 +7,6 @@ export const getConversations = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await getConversationsAPI();
-      toast.success("Conversations fetched successfully");
-
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(

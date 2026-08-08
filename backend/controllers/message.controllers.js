@@ -34,15 +34,7 @@ const sendMessage = async (req, res) => {
         await conversation.save();
 
         // Get receiver socket
-        const receiverSocketId =
-            getReceiverSocketId(receiver.toString());
-
-        console.log("================================");
-        console.log("SENDER:", sender.toString());
-        console.log("RECEIVER:", receiver.toString());
-        console.log("RECEIVER SOCKET:", receiverSocketId);
-        console.log("MESSAGE:", newMessage._id.toString());
-        console.log("================================");
+        const receiverSocketId = getReceiverSocketId(receiver.toString());
 
         // Send real-time message
         if (receiverSocketId) {
@@ -50,8 +42,6 @@ const sendMessage = async (req, res) => {
                 "newMessage",
                 newMessage
             );
-
-            console.log("✅ MESSAGE EMITTED");
         } else {
             console.log("❌ RECEIVER IS NOT ONLINE");
         }
@@ -93,8 +83,6 @@ const getMessage = async (req, res) => {
     const messages = await Message.find({
       conversation: conversation._id,
     }).sort({ createdAt: 1 });
-
-    console.log("Messages:", messages);
 
     return res.status(200).json({
       success: true,
