@@ -4,65 +4,77 @@ import { io, getReceiverSocketId } from "../utils/socket.js";
 
 const sendMessage = async (req, res) => {
     try {
-
         const sender = req.user._id;
         const receiver = req.params.receiverId;
-
         const { text, image } = req.body;
 
         let conversation = await Conversation.findOne({
             participants: {
-                $all: [sender, receiver]
-            }
+                $all: [sender, receiver],
+            },
         });
 
         if (!conversation) {
             conversation = await Conversation.create({
                 participants: [sender, receiver],
-                messages: []
+                messages: [],
             });
         }
 
+        // Save message
         const newMessage = await Message.create({
             conversation: conversation._id,
             sender,
             receiver,
             text,
-            image
+            image,
         });
 
         conversation.lastMessage = newMessage._id;
-
         await conversation.save();
+
+        // Get receiver socket
+        const receiverSocketId =
+            getReceiverSocketId(receiver.toString());
+
+        console.log("================================");
+        console.log("SENDER:", sender.toString());
+        console.log("RECEIVER:", receiver.toString());
+        console.log("RECEIVER SOCKET:", receiverSocketId);
+        console.log("MESSAGE:", newMessage._id.toString());
+        console.log("================================");
+
+        // Send real-time message
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit(
+                "newMessage",
+                newMessage
+            );
+
+            console.log("✅ MESSAGE EMITTED");
+        } else {
+            console.log("❌ RECEIVER IS NOT ONLINE");
+        }
 
         return res.status(201).json({
             success: true,
-            message: newMessage
+            message: newMessage,
         });
 
     } catch (error) {
-        console.error(error);
-        console.log("===== SEND MESSAGE ERROR =====");
-        console.error(error);
-        console.log("==============================");
-
+        console.error("SEND MESSAGE ERROR:", error);
 
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message,
         });
     }
 };
 
 const getMessage = async (req, res) => {
-    console.log("🔥 GET MESSAGE CONTROLLER HIT");
   try {
     const sender = req.user._id;
     const receiver = req.params.receiverId;
-
-    console.log("========== GET MESSAGE ==========");
-    console.log("Sender:", sender);
-    console.log("Receiver:", receiver);
 
     const conversation = await Conversation.findOne({
     participants: {
@@ -70,7 +82,6 @@ const getMessage = async (req, res) => {
     },
     });
 
-    console.log("Conversation Found:", conversation);
 
     if (!conversation) {
       return res.status(200).json({
@@ -141,7 +152,6 @@ const deleteMessage =async(req,res)=>{
         })
     }
 }
-
 
 export {
     sendMessage,

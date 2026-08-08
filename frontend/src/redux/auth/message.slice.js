@@ -52,6 +52,9 @@ const messageSlice = createSlice({
       state.success = false;
       state.error = null;
     },
+    addMessage: (state, action) => {
+        state.messages.push(action.payload);
+    },
   },
 
   extraReducers: (builder) => {
@@ -94,3 +97,4 @@ const messageSlice = createSlice({
 export const { resetState } = messageSlice.actions;
 
 export default messageSlice.reducer;
+export const { addMessage } = messageSlice.actions;
