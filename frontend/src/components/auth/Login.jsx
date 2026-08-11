@@ -41,9 +41,7 @@ const Login = () => {
 
     try {
       const result = await dispatch(loginUser(form)).unwrap();
-      console.log("Login Result:", result);
-      toast.success("Login Successfully 🎉");
-
+     
       setTimeout(() => {
         navigate("/chat");
       }, 1000);
