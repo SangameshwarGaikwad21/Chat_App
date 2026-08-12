@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { registerUserAPI,loginUserAPI, userProfileAPI } from "../../services/authService";
+import { registerUserAPI,loginUserAPI, userProfileAPI, logoutAPI } from "../../services/authService";
 
 export const registerUser = createAsyncThunk("auth/register",async(userData,thunkAPI)=>{
     try {
@@ -22,6 +22,19 @@ export const loginUser = createAsyncThunk("auth/login",async(userData,thunkAPI)=
         return thunkAPI.rejectWithValue(
             error.response?.data?.message || "User Login Failed"
         )  
+    }
+})
+
+export const logoutUser = createAsyncThunk("auth/logout",async(_,thunkAPI)=>{
+    try {
+        const response = await logoutAPI()
+        return response
+        console.log("Done",response)
+    } 
+    catch (error) {
+         return thunkAPI.rejectWithValue(
+            error.response?.data?.message || "User Logout Failed"
+        )    
     }
 })
 
@@ -85,18 +98,30 @@ const authSlice = createSlice({
             state.error = null;
         })
        .addCase(loginUser.fulfilled, (state, action) => {
-
             state.loading = false;
             state.success = true;
             state.error = null;
             state.user = action.payload.user;
             state.isAuthenticated = true;
-
-            console.log("Redux User:", state.user);
         })
         .addCase(loginUser.rejected,(state,action)=>{
             state.loading = false;
             state.success = false;
+            state.error = action.payload;
+        })
+
+        // logoutUser
+       .addCase(logoutUser.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(logoutUser.fulfilled, (state, action) => {
+            state.loading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+            state.error = null;
+        })
+        .addCase(logoutUser.rejected, (state, action) => {
+            state.loading = false;
             state.error = action.payload;
         })
 

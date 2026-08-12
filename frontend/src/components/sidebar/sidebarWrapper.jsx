@@ -6,7 +6,7 @@ import { getConversations,setSelectedConversation } from "../../redux/auth/conve
 import { useDispatch,useSelector } from "react-redux";
 import {getMessages} from "../../redux/auth/message.slice";
 import { useNavigate } from "react-router-dom";
-
+import { logoutUser } from "../../redux/auth/auth.slice";
 
 
 const SidebarWrapper = ({ closeSidebar }) => {
@@ -32,6 +32,16 @@ const SidebarWrapper = ({ closeSidebar }) => {
   dispatch(getMessages(chat.user._id));
   closeSidebar?.();
 };
+
+    const handlelogOut = async()=>{
+        try {
+            await dispatch(logoutUser())
+            navigate("/login");
+        } 
+        catch (error) {
+            console.error("Logout failed:", error);
+        }
+    }
 
   return (
     <motion.aside
@@ -152,6 +162,7 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
             {/* Logout */}
             <button
+            onClick={handlelogOut}
                 className="
                     ml-1
                     rounded-xl
