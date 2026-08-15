@@ -8,6 +8,7 @@ import Profile from './components/auth/Profile';
 import { useDispatch } from 'react-redux';
 import { getUserProfile } from "./redux/auth/auth.slice";
 import { useEffect } from 'react';
+import EditProfile from './components/auth/EditProfile';
 
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
         <Route path='/login' element={<Login/>} />
         <Route path='/chat' element={<Chat/>} />
         <Route path='/profile' element={<Profile/>} />
+        <Route path='/edit-profile' element={<EditProfile/>} />
       </Routes>
     </div>
   )

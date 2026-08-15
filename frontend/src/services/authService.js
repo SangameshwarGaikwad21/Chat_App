@@ -32,3 +32,16 @@ export const userProfileAPI = async () => {
         throw error;
     }
 };
+
+
+export const updateUserProfileAPI = async()=>{
+    try {
+        const res = await axiosInstance.post("/user/update-profile",)
+        console.log("Profile Update:-",res.data)
+        return res.data
+    } 
+    catch (error) {
+        console.log("update profile error",error.message)
+        throw error;    
+    }
+}

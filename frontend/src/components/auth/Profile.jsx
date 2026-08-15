@@ -969,8 +969,12 @@ export default function Profile() {
                             "
                         >
                             <UserRound size={16} />
+                            
+                            <Link to="/edit-profile">
+                                Edit Profile
+                            </Link>
 
-                            Edit Profile
+                            
                         </motion.button>
 
 

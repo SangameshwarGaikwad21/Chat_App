@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { registerUserAPI,loginUserAPI, userProfileAPI, logoutAPI } from "../../services/authService";
+import { registerUserAPI,loginUserAPI, userProfileAPI, logoutAPI, updateUserProfileAPI } from "../../services/authService";
 
 export const registerUser = createAsyncThunk("auth/register",async(userData,thunkAPI)=>{
     try {
@@ -47,6 +47,21 @@ export const getUserProfile = createAsyncThunk(
         } catch (error) {
             return thunkAPI.rejectWithValue(
                 error.response?.data?.message || "Get Profile Failed"
+            );
+        }
+    }
+);
+
+export const UpdateUserProfile = createAsyncThunk("auth/update-profile",
+    async (userData, thunkAPI) => {
+        try {
+            const response = await updateUserProfileAPI(userData);
+            console.log(response.data)
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(
+                error.response?.data?.message ||
+                "Update Profile Failed"
             );
         }
     }
@@ -139,6 +154,21 @@ const authSlice = createSlice({
             state.loading = false;
             state.user = null;
             state.isAuthenticated = false;
+            state.error = action.payload;
+        })
+
+        // userUpdateProfile
+        .addCase(UpdateUserProfile.pending,(state)=>{
+            state.loading = true
+            state.error = null
+        })
+        .addCase(UpdateUserProfile.fulfilled, (state, action) => {
+            state.loading = false;
+            state.user = action.payload;
+        })
+
+        .addCase(UpdateUserProfile.rejected, (state, action) => {
+            state.loading = false;
             state.error = action.payload;
         })
     }

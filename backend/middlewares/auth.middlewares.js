@@ -14,6 +14,10 @@ export const VerifyJWT = async (req, res, next) => {
             });
         }
 
+        console.log("COOKIE:", req.cookies);
+            console.log("AUTH HEADER:", req.header("Authorization"));
+            console.log("TOKEN:", token);
+
         const decoded = JWT.verify(
             token,
             process.env.ACCESS_TOKEN_SECRET
