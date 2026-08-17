@@ -14,6 +14,10 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
   const { user } = useSelector((state) => state.auth);
 
+
+console.log("USER:", user);
+console.log("AVATAR:", user?.avatar);
+
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
