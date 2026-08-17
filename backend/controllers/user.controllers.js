@@ -246,50 +246,67 @@ const updateUserAvatar = async(req,res)=>{
     );
 }
 
-const updateProfile = async(req,res)=>{
+const updateProfile = async (req, res) => {
+    try {
+        const { username, email, bio } = req.body;
 
-    const {username,email,bio} =req.body
-
-    if(!username || !email){
-        return res.status(400).json({
-            message:"All Fields are required"
-        })
-    }
-
-    const userExisted = await User.findOne({
-        _id: { $ne: req.user._id },
-        $or: [{ username }, { email }],
-    })
-
-    if(userExisted){
-        return res.status(401).json({
-            message:"Unauthorized User"
-        })
-    }
-
-    const updateUser = await User.findByIdAndUpdate(
-        req.user._id,
-        { 
-            $set: 
-            { 
-                username, 
-                email,
-                bio 
-            } 
-        },
-        { 
-            new: true, 
-            runValidators: true 
+        // Validate required fields
+        if (!username || !email) {
+            return res.status(400).json({
+                message: "Username and email are required"
+            });
         }
-    )   .select("-password -refreshToken")
 
-    return res
-    .status(200)
-    .json({
-        updateUser,
-        message:"Account Updated Successfully"
-    })
-}
+        // Check whether username or email already belongs to another user
+        const userExisted = await User.findOne({
+            _id: { $ne: req.user._id },
+            $or: [
+                { username },
+                { email }
+            ]
+        });
+
+        if (userExisted) {
+            return res.status(409).json({
+                message: "Username or email already exists"
+            });
+        }
+
+        // Update user
+        const updateUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    username,
+                    email,
+                    bio
+                }
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select("-password -refreshToken");
+
+        if (!updateUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            updateUser,
+            message: "Account Updated Successfully"
+        });
+
+    } catch (error) {
+        console.error("Update Profile Error:", error);
+
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
+};
 
 
 export{

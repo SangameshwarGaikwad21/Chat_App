@@ -2,9 +2,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { UpdateUserProfile } from "../../redux/auth/auth.slice";
+import { useNavigate } from "react-router-dom";
+
 
 export default function UpdateProfile() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { user, loading } = useSelector((state) => state.auth);
 
@@ -25,6 +28,14 @@ export default function UpdateProfile() {
         e.preventDefault();
 
         dispatch(UpdateUserProfile(formData));
+
+         // Clear form after successful update
+        setFormData({
+            username: "",
+            email: "",
+            bio: "",
+        });
+        navigate("/chat")
     };
 
     return (

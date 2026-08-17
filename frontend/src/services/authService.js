@@ -34,14 +34,22 @@ export const userProfileAPI = async () => {
 };
 
 
-export const updateUserProfileAPI = async()=>{
+export const updateUserProfileAPI = async (data) => {
     try {
-        const res = await axiosInstance.post("/user/update-profile",)
-        console.log("Profile Update:-",res.data)
-        return res.data
-    } 
-    catch (error) {
-        console.log("update profile error",error.message)
-        throw error;    
+        const res = await axiosInstance.post(
+            "/user/update-profile",
+            data
+        );
+
+        console.log("Profile Update:", res.data);
+
+        return res.data;
+    } catch (error) {
+        console.log(
+            "Update profile error:",
+            error.response?.data || error.message
+        );
+
+        throw error;
     }
-}
+};

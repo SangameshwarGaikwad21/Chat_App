@@ -56,7 +56,7 @@ export const UpdateUserProfile = createAsyncThunk("auth/update-profile",
     async (userData, thunkAPI) => {
         try {
             const response = await updateUserProfileAPI(userData);
-            console.log(response.data)
+            console.log(response)
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(
