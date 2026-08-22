@@ -141,8 +141,61 @@ const deleteMessage =async(req,res)=>{
     }
 }
 
+const editMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { message } = req.body;
+
+    const userId = req.user._id;
+
+    if (!message || message.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Message cannot be empty",
+      });
+    }
+
+    const existingMessage = await Message.findById(messageId);
+
+    if (!existingMessage) {
+      return res.status(404).json({
+        success: false,
+        message: "Message not found",
+      });
+    }
+
+    // Only sender can edit the message
+    if (existingMessage.sender.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only edit your own message",
+      });
+    }
+
+    existingMessage.text = message.trim();
+    existingMessage.isEdited = true;
+    existingMessage.editedAt = new Date();
+
+    await existingMessage.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Message updated successfully",
+      data: existingMessage,
+    });
+  } catch (error) {
+    console.log("Edit message error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
     sendMessage,
     getMessage,
-    deleteMessage
+    deleteMessage,
+    editMessage
 }

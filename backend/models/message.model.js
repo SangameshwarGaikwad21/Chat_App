@@ -28,6 +28,14 @@ const messageSchema = new Schema(
        isSeen: {
             type: Boolean,
             default: false
+        },
+        isEdited: {
+            type: Boolean,
+            default: false,
+        },
+        editedAt: {
+            type: Date,
+            default: null,
         }
     },
     {

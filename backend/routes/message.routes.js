@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteMessage, getMessage, sendMessage } from "../controllers/message.controllers.js";
+import { deleteMessage, editMessage, getMessage, sendMessage } from "../controllers/message.controllers.js";
 import { VerifyJWT } from "../middlewares/auth.middlewares.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 
@@ -10,5 +10,7 @@ router.post("/send-message/:receiverId", VerifyJWT, upload.single("image"), send
 router.get("/:receiverId", VerifyJWT, getMessage);
 
 router.delete("/:messageId", VerifyJWT, deleteMessage);
+
+router.put( "/edit-message/:messageId", VerifyJWT, editMessage);
 
 export default router;
