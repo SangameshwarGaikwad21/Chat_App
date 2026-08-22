@@ -15,10 +15,22 @@ export const getMessagesAPI = async (receiverId) => {
     return response.data;
 };
 
-export const deleteMessageAPI = async (messageId) => {
-    const response = await axiosInstance.delete(
-        `/message/${messageId}`
-    );
 
-    return response.data;
+export const deleteMessageAPI = async (messageId) => {
+  const response = await axiosInstance.delete(
+    `/message/${messageId}`
+  );
+
+  return response.data;
+};
+
+export const updatedMessageAPI = async (messageId,message) => {
+  const response = await axiosInstance.put(
+    `/message/edit-message/${messageId}`,
+    {
+      message,
+    }
+  );
+
+  return response.data;
 };

@@ -1,652 +1,320 @@
-import { motion } from "framer-motion";
-import { MessageCircleMore } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+
+import {
+  MessageCircleMore,
+  Pencil,
+  Trash2,
+  Check,
+  X,
+} from "lucide-react";
+
+import {
+  addMessage,
+  deleteMessage,
+  updateMessage,
+} from "../../redux/auth/message.slice";
+
 import socket from "../../socket/socket";
-import { addMessage } from "../../redux/auth/message.slice";
 
 export default function ChatBody() {
-    const bottomRef = useRef(null);
+  const bottomRef = useRef(null);
 
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const { messages, loading } = useSelector(
-        (state) => state.message
-    );
+  const { messages, loading } = useSelector(
+    (state) => state.message
+  );
 
-    const { user } = useSelector(
-        (state) => state.auth
-    );
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({
-            behavior: "smooth",
-        });
-    }, [messages]);
+  const { user } = useSelector(
+    (state) => state.auth
+  );
 
-    // =========================================================
-    // SOCKET.IO CONNECTION
-    // =========================================================
+  // Edit states
+  const [editingMessageId, setEditingMessageId] =
+    useState(null);
 
-    useEffect(() => {
-        if (!user?._id) {
-            return;
-        }
+  const [editedText, setEditedText] =
+    useState("");
 
-        // Send logged-in user ID to socket server
-        socket.io.opts.query = {
-            userId: user._id,
-        };
+  // Auto scroll
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
-        socket.connect();
+  // Receive new message from socket
+  useEffect(() => {
+    if (!socket) return;
 
-        const handleConnect = () => {
-            console.log("Socket connected:", socket.id);
-        };
-
-        const handleConnectError = (error) => {
-            console.error(
-                "Socket connection error:",
-                error.message
-            );
-        };
-
-        const handleNewMessage = (message) => {
-            dispatch(addMessage(message));
-        };
-
-        socket.on("connect", handleConnect);
-        socket.on("connect_error", handleConnectError);
-        socket.on("newMessage", handleNewMessage);
-
-        return () => {
-            socket.off("connect", handleConnect);
-            socket.off("connect_error", handleConnectError);
-            socket.off("newMessage", handleNewMessage);
-
-            socket.disconnect();
-        };
-    }, [user?._id, dispatch]);
-
-    // =========================================================
-    // FORMAT MESSAGE DATE
-    // =========================================================
-
-    const formatDate = (date) => {
-        const today = new Date();
-
-        const yesterday = new Date();
-
-        yesterday.setDate(
-            today.getDate() - 1
-        );
-
-        const messageDate = new Date(date);
-
-        if (
-            messageDate.toDateString() ===
-            today.toDateString()
-        ) {
-            return "Today";
-        }
-
-        if (
-            messageDate.toDateString() ===
-            yesterday.toDateString()
-        ) {
-            return "Yesterday";
-        }
-
-        return messageDate.toLocaleDateString(
-            "en-IN",
-            {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-            }
-        );
+    const handleNewMessage = (newMessage) => {
+      dispatch(addMessage(newMessage));
     };
 
-    // =========================================================
-    // LOADING STATE
-    // =========================================================
+    socket.on("newMessage", handleNewMessage);
 
-    if (loading) {
-        return (
-            <div className="flex h-full items-center justify-center bg-[#020617] text-white">
-                Loading...
-            </div>
-        );
+    return () => {
+      socket.off("newMessage", handleNewMessage);
+    };
+  }, [dispatch]);
+
+  // Delete message
+  const handleDelete = async (messageId) => {
+    try {
+      await dispatch(deleteMessage(messageId)).unwrap();
+      toast.success("Message deleted successfully");
+    } catch (error) {
+      console.error("Delete Error:", error);
+      toast.error(
+        error || "Failed to delete message"
+      );
     }
+  };
+ 
+  // Start editing
+  const handleStartEdit = (message) => {
+    setEditingMessageId(message._id);
+    setEditedText(message.text);
+  };
 
-    // =========================================================
-    // MAIN UI
-    // =========================================================
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditedText("");
+  };
 
+  // Save edited message
+  const handleEdit = async (messageId) => {
+    try {
+      if (!editedText.trim()) {
+        toast.error("Message cannot be empty");
+        return;
+      }
+
+      await dispatch(
+        updateMessage({
+          messageId,
+          message: editedText.trim(),
+        })
+      ).unwrap();
+
+      toast.success("Message updated successfully");
+
+      setEditingMessageId(null);
+      setEditedText("");
+
+    } catch (error) {
+      console.error("Update Error:", error);
+
+      toast.error(
+        error || "Failed to update message"
+      );
+    }
+  };
+
+  if (loading) {
     return (
-        <motion.div initial={{opacity: 0,}}
-            animate={{
-                opacity: 1,
-            }}
-            transition={{
-                duration: 0.35,
-            }}
-            className="
-                relative
-                flex-1
-                h-full
-                overflow-y-auto
-                bg-[#020617]
-                px-4
-                py-6
-                sm:px-6
-            "
-        >
+      <div className="flex h-full items-center justify-center">
+        Loading messages...
+      </div>
+    );
+  }
 
-            {/* =================================================
-                BACKGROUND DECORATION
-            ================================================= */}
+  return (
+    <div className="flex h-full flex-col overflow-y-auto px-4 py-6">
 
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="flex flex-col gap-4">
 
-                <div
-                    className="
-                        absolute
-                        -left-40
-                        top-20
-                        h-80
-                        w-80
-                        rounded-full
-                        bg-blue-500/5
-                        blur-3xl
-                    "
-                />
+        {messages?.map((message) => {
+          const isMe =
+            message.sender?.toString() ===
+            user?._id?.toString();
 
-                <div
-                    className="
-                        absolute
-                        -right-40
-                        bottom-20
-                        h-80
-                        w-80
-                        rounded-full
-                        bg-purple-500/5
-                        blur-3xl
-                    "
-                />
-
-            </div>
-
-            {/* =================================================
-                MESSAGE CONTAINER
-            ================================================= */}
-
+          return (
             <div
-                className="
-                    relative
-                    z-10
-                    mx-auto
-                    flex
-                    w-full
-                    max-w-4xl
-                    flex-col
-                    gap-2
-                "
+              key={message._id}
+              className={`group flex flex-col ${
+                isMe ? "items-end" : "items-start"
+              }`}
             >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`
+                  max-w-[75%]
+                  rounded-2xl
+                  px-4
+                  py-2
+                  break-words
+                  ${
+                    isMe
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-white"
+                  }
+                `}
+              >
+                {editingMessageId === message._id ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={editedText}
+                      onChange={(e) =>
+                        setEditedText(e.target.value)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleEdit(message._id);
+                        }
 
-                {messages.length > 0 ? (
+                        if (e.key === "Escape") {
+                          handleCancelEdit();
+                        }
+                      }}
+                      autoFocus
+                      className="
+                        min-w-[180px]
+                        bg-transparent
+                        text-white
+                        outline-none
+                      "
+                    />
 
-                    <>
-                        {/* =================================================
-                            MESSAGES
-                        ================================================= */}
-
-                        {messages.map((message, index) => {
-
-                            // -----------------------------------------
-                            // GET SENDER ID
-                            // -----------------------------------------
-
-                            const senderId =
-                                typeof message.sender === "object"
-                                    ? message.sender._id
-                                    : message.sender;
-
-                            // -----------------------------------------
-                            // CHECK IF MESSAGE IS MINE
-                            // -----------------------------------------
-
-                            const isMe =
-                                String(senderId) ===
-                                String(user?._id);
-
-                            // -----------------------------------------
-                            // CURRENT MESSAGE DATE
-                            // -----------------------------------------
-
-                            const currentDate =
-                                formatDate(
-                                    message.createdAt
-                                );
-
-                            // -----------------------------------------
-                            // PREVIOUS MESSAGE DATE
-                            // -----------------------------------------
-
-                            const previousDate =
-                                index > 0
-                                    ? formatDate(
-                                        messages[index - 1]
-                                            .createdAt
-                                    )
-                                    : null;
-
-                            // -----------------------------------------
-                            // SHOW DATE SEPARATOR
-                            // -----------------------------------------
-
-                            const showDate =
-                                currentDate !== previousDate;
-
-                            return (
-                                <div
-                                    key={
-                                        message._id ||
-                                        `${message.createdAt}-${index}`
-                                    }
-                                >
-
-                                    {/* =================================================
-                                        DATE SEPARATOR
-                                    ================================================= */}
-
-                                    {showDate && (
-                                        <motion.div
-                                            initial={{
-                                                opacity: 0,
-                                                y: 5,
-                                            }}
-                                            animate={{
-                                                opacity: 1,
-                                                y: 0,
-                                            }}
-                                            transition={{
-                                                duration: 0.25,
-                                            }}
-                                            className="
-                                                my-6
-                                                flex
-                                                items-center
-                                                gap-3
-                                            "
-                                        >
-
-                                            <div
-                                                className="
-                                                    h-px
-                                                    flex-1
-                                                    bg-slate-800
-                                                "
-                                            />
-
-                                            <span
-                                                className="
-                                                    rounded-full
-                                                    border
-                                                    border-slate-800
-                                                    bg-slate-900/80
-                                                    px-4
-                                                    py-1.5
-                                                    text-[11px]
-                                                    font-medium
-                                                    text-slate-400
-                                                    shadow-sm
-                                                    backdrop-blur
-                                                "
-                                            >
-                                                {currentDate}
-                                            </span>
-
-                                            <div
-                                                className="
-                                                    h-px
-                                                    flex-1
-                                                    bg-slate-800
-                                                "
-                                            />
-
-                                        </motion.div>
-                                    )}
-
-                                    {/* =================================================
-                                        MESSAGE ROW
-                                    ================================================= */}
-
-                                    <div
-                                        className={`
-                                            mb-2
-                                            flex
-                                            ${
-                                                isMe
-                                                    ? "justify-end"
-                                                    : "justify-start"
-                                            }
-                                        `}
-                                    >
-
-                                        {/* =================================================
-                                            MESSAGE CONTAINER
-                                        ================================================= */}
-
-                                        <div
-                                            className={`
-                                                group
-                                                relative
-                                                flex
-                                                max-w-[80%]
-                                                flex-col
-                                                sm:max-w-[65%]
-                                                ${
-                                                    isMe
-                                                        ? "items-end"
-                                                        : "items-start"
-                                                }
-                                            `}
-                                        >
-
-                                            {/* =================================================
-                                                MESSAGE BUBBLE
-                                            ================================================= */}
-
-                                            <motion.div
-                                                layout
-                                                initial={{
-                                                    opacity: 0,
-                                                    scale: 0.7,
-                                                    x: isMe
-                                                        ? 30
-                                                        : -30,
-                                                    y: 10,
-                                                }}
-                                                animate={{
-                                                    opacity: 1,
-                                                    scale: 1,
-                                                    x: 0,
-                                                    y: 0,
-                                                }}
-                                                transition={{
-                                                    type: "spring",
-                                                    stiffness: 500,
-                                                    damping: 30,
-                                                    mass: 0.7,
-                                                }}
-                                                whileHover={{
-                                                    scale: 1.015,
-                                                }}
-                                                whileTap={{
-                                                    scale: 0.98,
-                                                }}
-                                                className={`
-                                                    relative
-                                                    w-fit
-                                                    max-w-full
-                                                    rounded-2xl
-                                                    border
-                                                    px-4
-                                                    py-2.5
-                                                    text-sm
-                                                    leading-relaxed
-                                                    shadow-lg
-                                                    break-words
-                                                    whitespace-pre-wrap
-
-                                                    ${
-                                                        isMe
-                                                            ? `
-                                                                rounded-br-md
-                                                            
-                                                                border-blue-400/20
-                                                                bg-gradient-to-br
-                                                                from-blue-600
-                                                                via-blue-600
-                                                                to-indigo-600
-                                                                text-white
-                                                                shadow-blue-950/40
-                                                            `
-                                                            : `
-                                                                rounded-bl-md
-                                                                border-slate-700/60
-                                                                bg-gradient-to-br
-                                                                from-slate-800
-                                                                to-slate-900
-                                                                text-slate-100
-                                                                shadow-black/40
-                                                            `
-                                                    }
-                                                `}
-                                            >
-
-                                                {/* MESSAGE TEXT */}
-
-                                                {message.text}
-
-                                                {/* =================================================
-                                                    IMAGE MESSAGE
-                                                ================================================= */}
-
-                                                {message.image && (
-                                                    <img
-                                                        src={
-                                                            message.image
-                                                        }
-                                                        alt="message"
-                                                        className="
-                                                            mt-2
-                                                            max-h-72
-                                                            max-w-full
-                                                            rounded-xl
-                                                            object-cover
-                                                        "
-                                                    />
-                                                )}
-
-                                            </motion.div>
-
-                                            {/* =================================================
-                                                MESSAGE TIME
-                                            ================================================= */}
-
-                                            <div
-                                                className={`
-                                                    mt-1
-                                                    flex
-                                                    items-center
-                                                    justify-end
-                                                    gap-1
-                                                    text-[10px]
-
-                                                    ${
-                                                        isMe
-                                                            ? "text-blue-100/70"
-                                                            : "text-slate-500"
-                                                    }
-                                                `}
-                                            >
-
-                                                {new Date(
-                                                    message.createdAt
-                                                ).toLocaleTimeString(
-                                                    "en-IN",
-                                                    {
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                    }
-                                                )}
-
-                                                {/* =============================================
-                                                    MESSAGE STATUS
-                                                ============================================= */}
-
-                                                {isMe && (
-                                                    <span
-                                                        className="
-                                                            text-[11px]
-                                                            font-medium
-                                                        "
-                                                    >
-                                                        ✓
-                                                    </span>
-                                                )}
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            );
-                        })}
-
-                        {/* =================================================
-                            SCROLL ANCHOR
-                        ================================================= */}
-
-                        <div ref={bottomRef} />
-
-                    </>
-
-                ) : (
-
-                    /* =================================================
-                        EMPTY STATE
-                    ================================================= */
-
-                    <motion.div
-                        initial={{
-                            opacity: 0,
-                            scale: 0.95,
-                            y: 20,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                            y: 0,
-                        }}
-                        transition={{
-                            duration: 0.4,
-                            type: "spring",
-                            stiffness: 120,
-                        }}
-                        className="
-                            flex
-                            min-h-[70vh]
-                            flex-col
-                            items-center
-                            justify-center
-                            px-6
-                            text-center
-                        "
+                    <button
+                      onClick={() =>
+                        handleEdit(message._id)
+                      }
+                      className="
+                        rounded-md
+                        p-1
+                        hover:bg-white/10
+                      "
                     >
+                      <Check size={16} />
+                    </button>
 
-                        {/* ICON */}
+                    <button
+                      onClick={handleCancelEdit}
+                      className="
+                        rounded-md
+                        p-1
+                        hover:bg-white/10
+                      "
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <span>{message.text}</span>
 
-                        <motion.div
-                            animate={{
-                                y: [0, -5, 0],
-                            }}
-                            transition={{
-                                duration: 2.5,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                            }}
-                            className="
-                                flex
-                                h-20
-                                w-20
-                                items-center
-                                justify-center
-                                rounded-3xl
-                                border
-                                border-slate-800
-                                bg-slate-900
-                                shadow-xl
-                                shadow-black/20
-                            "
-                        >
-                            <MessageCircleMore
-                                size={38}
-                                strokeWidth={1.5}
-                                className="text-blue-500"
-                            />
-                        </motion.div>
+                    {message.isEdited && (
+                      <span className="ml-2 text-[10px] opacity-60">
+                        edited
+                      </span>
+                    )}
+                  </>
+                )}
+              </motion.div>
 
-                        {/* HEADING */}
+              {isMe &&
+                editingMessageId !== message._id && (
+                  <div
+                    className="
+                      mt-1
+                      flex
+                      gap-2
+                      opacity-0
+                      transition
+                      duration-200
+                      group-hover:opacity-100
+                    "
+                  >
+                    <button
+                      onClick={() =>
+                        handleStartEdit(message)
+                      }
+                      className="
+                        flex
+                        items-center
+                        gap-1
+                        rounded-md
+                        px-2
+                        py-1
+                        text-xs
+                        text-blue-400
+                        hover:bg-blue-500/10
+                      "
+                    >
+                      <Pencil size={13} />
+                      Edit
+                    </button>
 
-                        <h2
-                            className="
-                                mt-6
-                                text-xl
-                                font-semibold
-                                text-white
-                                sm:text-2xl
-                            "
-                        >
-                            Start the conversation
-                        </h2>
-
-                        {/* DESCRIPTION */}
-
-                        <p
-                            className="
-                                mt-2
-                                max-w-sm
-                                text-sm
-                                leading-6
-                                text-slate-500
-                            "
-                        >
-                            Send a message to start chatting.
-                            Your conversation will appear here.
-                        </p>
-
-                        {/* DECORATION */}
-
-                        <div
-                            className="
-                                mt-6
-                                flex
-                                items-center
-                                gap-2
-                                text-xs
-                                text-slate-600
-                            "
-                        >
-                            <motion.span
-                                animate={{
-                                    opacity: [0.3, 1, 0.3],
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                }}
-                                className="
-                                    h-1.5
-                                    w-1.5
-                                    rounded-full
-                                    bg-blue-500
-                                "
-                            />
-
-                            Messages are delivered in real time
-                        </div>
-
-                    </motion.div>
-
+                    <button
+                      onClick={() =>
+                        handleDelete(message._id)
+                      }
+                      className="
+                        flex
+                        items-center
+                        gap-1
+                        rounded-md
+                        px-2
+                        py-1
+                        text-xs
+                        text-red-400
+                        hover:bg-red-500/10
+                      "
+                    >
+                      <Trash2 size={13} />
+                      Delete
+                    </button>
+                  </div>
                 )}
 
+              <span
+                className="
+                  mt-1
+                  px-1
+                  text-[10px]
+                  text-gray-400
+                "
+              >
+                {message.createdAt &&
+                  new Date(
+                    message.createdAt
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+              </span>
             </div>
+          );
+        })}
+      </div>
 
-        </motion.div>
-    );
+      {!loading && messages?.length === 0 && (
+        <div
+          className="
+            flex
+            flex-1
+            flex-col
+            items-center
+            justify-center
+            text-gray-400
+          "
+        >
+          <MessageCircleMore size={40} />
+
+          <p className="mt-2">
+            No messages yet
+          </p>
+        </div>
+      )}
+
+      <div ref={bottomRef} />
+    </div>
+  );
 }
-
