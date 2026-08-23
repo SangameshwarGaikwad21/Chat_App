@@ -3,62 +3,83 @@ import { Message } from "../models/message.model.js";
 import { io, getReceiverSocketId } from "../utils/socket.js";
 
 const sendMessage = async (req, res) => {
-    try {
-        const sender = req.user._id;
-        const receiver = req.params.receiverId;
-        const { text, image } = req.body;
+  try {
+    const sender = req.user._id;
+    const receiver = req.params.receiverId;
 
-        let conversation = await Conversation.findOne({
-            participants: {
-                $all: [sender, receiver],
-            },
-        });
+    const { text } = req.body;
 
-        if (!conversation) {
-            conversation = await Conversation.create({
-                participants: [sender, receiver],
-                messages: [],
-            });
-        }
+    // Image will come from Multer
+    const image = req.file;
 
-        // Save message
-        const newMessage = await Message.create({
-            conversation: conversation._id,
-            sender,
-            receiver,
-            text,
-            image,
-        });
-
-        conversation.lastMessage = newMessage._id;
-        await conversation.save();
-
-        // Get receiver socket
-        const receiverSocketId = getReceiverSocketId(receiver.toString());
-
-        // Send real-time message
-        if (receiverSocketId) {
-            io.to(receiverSocketId).emit(
-                "newMessage",
-                newMessage
-            );
-        } else {
-            console.log("❌ RECEIVER IS NOT ONLINE");
-        }
-
-        return res.status(201).json({
-            success: true,
-            message: newMessage,
-        });
-
-    } catch (error) {
-        console.error("SEND MESSAGE ERROR:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+    // User must send text or image
+    if (!text?.trim() && !image) {
+      return res.status(400).json({
+        success: false,
+        message: "Text or image is required",
+      });
     }
+
+    let conversation = await Conversation.findOne({
+      participants: {
+        $all: [sender, receiver],
+      },
+    });
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [sender, receiver],
+        messages: [],
+      });
+    }
+
+    let imageUrl = null;
+
+    // Upload image if user selected one
+    if (image) {
+      // Upload to Cloudinary
+      // imageUrl = result.secure_url;
+    }
+
+    // Save message
+    const newMessage = await Message.create({
+      conversation: conversation._id,
+      sender,
+      receiver,
+      text: text || "",
+      image: imageUrl,
+    });
+
+    conversation.lastMessage = newMessage._id;
+
+    await conversation.save();
+
+    // Get receiver socket
+    const receiverSocketId = getReceiverSocketId(
+      receiver.toString()
+    );
+
+    // Send real-time message
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit(
+        "newMessage",
+        newMessage
+      );
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: newMessage,
+    });
+
+  } catch (error) {
+    console.error("SEND MESSAGE ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 const getMessage = async (req, res) => {

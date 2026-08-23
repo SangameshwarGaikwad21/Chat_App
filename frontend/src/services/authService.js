@@ -7,7 +7,6 @@ export const registerUserAPI = async(data)=>{
 
 export const loginUserAPI = async(data)=>{
     const res = await axiosInstance.post("/user/login",data)
-    console.log(res.data)
     return res.data
 }
 
@@ -28,7 +27,6 @@ export const userProfileAPI = async () => {
         });        
         return res.data;
     } catch (error) {
-        console.log("Profile Error:", error.response);
         throw error;
     }
 };
