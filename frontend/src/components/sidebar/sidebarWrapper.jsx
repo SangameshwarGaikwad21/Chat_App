@@ -1,33 +1,12 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-import {
-  Search,
-  LogOut,
-  MessageCircleMore,
-  X,
-  Image,
-  Users,
-} from "lucide-react";
-
+import {Search,LogOut,MessageCircleMore,X,Image,Users,} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-
-import {
-  getConversations,
-  setSelectedConversation,
-} from "../../redux/auth/conversation.slice";
-
-import {
-  getMessages,
-} from "../../redux/auth/message.slice";
-
+import {getConversations,setSelectedConversation,} from "../../redux/auth/conversation.slice";
+import { getMessages,} from "../../redux/auth/message.slice";
 import { useNavigate } from "react-router-dom";
-
-import {
-  logoutUser,
-} from "../../redux/auth/auth.slice";
+import {logoutUser,} from "../../redux/auth/auth.slice";
 
 
 const SidebarWrapper = ({ closeSidebar }) => {
@@ -56,19 +35,10 @@ const SidebarWrapper = ({ closeSidebar }) => {
     (state) => state.conversation
   );
 
-
-  // ========================================
-  // GET CONVERSATIONS
-  // ========================================
-
   useEffect(() => {
     dispatch(getConversations());
   }, [dispatch]);
 
-
-  // ========================================
-  // FILTER CONVERSATIONS
-  // ========================================
 
   const filteredConversations = useMemo(() => {
 
@@ -94,10 +64,6 @@ const SidebarWrapper = ({ closeSidebar }) => {
   }, [conversations, search]);
 
 
-  // ========================================
-  // SELECT CONVERSATION
-  // ========================================
-
   const handleConversationClick = (chat) => {
 
     dispatch(
@@ -111,10 +77,6 @@ const SidebarWrapper = ({ closeSidebar }) => {
     closeSidebar?.();
   };
 
-
-  // ========================================
-  // LOGOUT
-  // ========================================
 
   const handleLogout = async () => {
 
@@ -178,10 +140,6 @@ const SidebarWrapper = ({ closeSidebar }) => {
       "
     >
 
-
-      {/* ========================================
-          BACKGROUND EFFECTS
-      ======================================== */}
 
       <div
         className="
