@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { UpdateUserProfile } from "../../redux/auth/auth.slice";
 import { useNavigate } from "react-router-dom";
-
+import toast from "react-hot-toast";
 
 export default function UpdateProfile() {
     const dispatch = useDispatch();
@@ -27,15 +27,13 @@ export default function UpdateProfile() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        dispatch(UpdateUserProfile(formData));
-
-         // Clear form after successful update
-        setFormData({
-            username: "",
-            email: "",
-            bio: "",
-        });
-        navigate("/chat")
+        try {
+            await dispatch(UpdateUserProfile(formData)).unwrap();
+            toast.success("Profile updated successfully");
+            navigate("/profile");
+        } catch (error) {
+            toast.error(typeof error === "string" ? error : "Could not update profile");
+        }
     };
 
     return (
@@ -159,13 +157,13 @@ export default function UpdateProfile() {
                                 onChange={handleChange}
                                 placeholder="Tell something about yourself..."
                                 rows={4}
-                                maxLength={250}
+                                maxLength={150}
                                 className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder:text-zinc-600 outline-none resize-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                             />
 
                             <div className="text-right mt-1">
                                 <span className="text-xs text-zinc-600">
-                                    {formData.bio.length}/250
+                                    {formData.bio.length}/150
                                 </span>
                             </div>
                         </motion.div>
@@ -179,6 +177,7 @@ export default function UpdateProfile() {
                         >
                             <motion.button
                                 type="button"
+                                onClick={() => navigate("/profile")}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.97 }}
                                 className="flex-1 px-5 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-colors"

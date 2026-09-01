@@ -16,6 +16,7 @@ import {
   deleteMessage,
   updateMessage,
 } from "../../redux/auth/message.slice";
+import { getConversations } from "../../redux/auth/conversation.slice";
 
 import socket from "../../socket/socket";
 
@@ -30,6 +31,10 @@ export default function ChatBody() {
 
   const { user } = useSelector(
     (state) => state.auth
+  );
+
+  const { selectedConversation } = useSelector(
+    (state) => state.conversation
   );
 
   const [editingMessageId, setEditingMessageId] =
@@ -50,7 +55,18 @@ export default function ChatBody() {
     if (!socket) return;
 
     const handleNewMessage = (newMessage) => {
-      dispatch(addMessage(newMessage));
+      const senderId =
+        typeof newMessage.sender === "object"
+          ? newMessage.sender?._id
+          : newMessage.sender;
+
+      // Incoming messages for another chat belong in the sidebar, not the
+      // conversation currently open on screen.
+      if (senderId?.toString() === selectedConversation?.user?._id?.toString()) {
+        dispatch(addMessage(newMessage));
+      }
+
+      dispatch(getConversations());
     };
 
     socket.on("newMessage", handleNewMessage);
@@ -58,7 +74,7 @@ export default function ChatBody() {
     return () => {
       socket.off("newMessage", handleNewMessage);
     };
-  }, [dispatch]);
+  }, [dispatch, selectedConversation?.user?._id]);
 
   // Delete message
   const handleDelete = async (messageId) => {

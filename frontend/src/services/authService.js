@@ -20,15 +20,10 @@ export const logoutAPI = async () => {
 
 
 export const userProfileAPI = async () => {
-    try {
-        
-        const res = await axiosInstance.get("/user/me", {
-            withCredentials: true,
-        });        
-        return res.data;
-    } catch (error) {
-        throw error;
-    }
+    const res = await axiosInstance.get("/user/me", {
+        withCredentials: true,
+    });
+    return res.data;
 };
 
 
@@ -50,4 +45,9 @@ export const updateUserProfileAPI = async (data) => {
 
         throw error;
     }
+};
+
+export const getUsersAPI = async () => {
+    const res = await axiosInstance.get("/user");
+    return res.data.users;
 };

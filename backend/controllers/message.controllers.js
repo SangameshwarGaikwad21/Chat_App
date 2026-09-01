@@ -1,6 +1,7 @@
 import Conversation from "../models/conversation.model.js";
 import { Message } from "../models/message.model.js";
 import { io, getReceiverSocketId } from "../utils/socket.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const sendMessage = async (req, res) => {
   try {
@@ -37,8 +38,11 @@ const sendMessage = async (req, res) => {
 
     // Upload image if user selected one
     if (image) {
-      // Upload to Cloudinary
-      // imageUrl = result.secure_url;
+      const uploadedImage = await uploadOnCloudinary(image.path);
+      if (!uploadedImage?.secure_url && !uploadedImage?.url) {
+        return res.status(500).json({ success: false, message: "Image upload failed" });
+      }
+      imageUrl = uploadedImage.secure_url || uploadedImage.url;
     }
 
     // Save message
@@ -147,6 +151,14 @@ const deleteMessage = async (req, res) => {
 
     await Message.findByIdAndDelete(messageId);
 
+    const conversation = await Conversation.findById(message.conversation);
+    if (conversation?.lastMessage?.toString() === messageId) {
+      const previousMessage = await Message.findOne({ conversation: message.conversation })
+        .sort({ createdAt: -1 });
+      conversation.lastMessage = previousMessage?._id || null;
+      await conversation.save();
+    }
+
     return res.status(200).json({
       success: true,
       message: "Message Deleted Successfully",
@@ -199,6 +211,9 @@ const editMessage = async (req, res) => {
     existingMessage.editedAt = new Date();
 
     await existingMessage.save();
+    await Conversation.findByIdAndUpdate(existingMessage.conversation, {
+      $set: { updatedAt: new Date() },
+    });
 
     return res.status(200).json({
       success: true,

@@ -7,6 +7,7 @@ import {getConversations,setSelectedConversation,} from "../../redux/auth/conver
 import { getMessages,} from "../../redux/auth/message.slice";
 import { useNavigate } from "react-router-dom";
 import {logoutUser,} from "../../redux/auth/auth.slice";
+import { getUsersAPI } from "../../services/authService";
 
 
 const SidebarWrapper = ({ closeSidebar }) => {
@@ -16,6 +17,7 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
   const [search, setSearch] =
     useState("");
+  const [people, setPeople] = useState([]);
 
   const navigate = useNavigate();
 
@@ -39,17 +41,32 @@ const SidebarWrapper = ({ closeSidebar }) => {
     dispatch(getConversations());
   }, [dispatch]);
 
+  useEffect(() => {
+    getUsersAPI().then(setPeople).catch(() => setPeople([]));
+  }, []);
+
+  const availableChats = useMemo(() => {
+    const existingUserIds = new Set(
+      (conversations || []).map((conversation) => conversation.user?._id)
+    );
+    const newPeople = people
+      .filter((person) => !existingUserIds.has(person._id))
+      .map((person) => ({ _id: person._id, user: person, lastMessage: null }));
+
+    return [...(conversations || []), ...newPeople];
+  }, [conversations, people]);
+
 
   const filteredConversations = useMemo(() => {
 
     if (!search.trim()) {
-      return conversations || [];
+      return availableChats;
     }
 
     const searchValue =
       search.toLowerCase().trim();
 
-    return conversations?.filter((chat) => {
+    return availableChats.filter((chat) => {
 
       const username =
         chat.user?.username
@@ -61,7 +78,7 @@ const SidebarWrapper = ({ closeSidebar }) => {
 
     });
 
-  }, [conversations, search]);
+  }, [availableChats, search]);
 
 
   const handleConversationClick = (chat) => {

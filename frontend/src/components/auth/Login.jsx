@@ -40,7 +40,7 @@ const Login = () => {
     }
 
     try {
-      const result = await dispatch(loginUser(form)).unwrap();
+      await dispatch(loginUser(form)).unwrap();
      
       setTimeout(() => {
         navigate("/chat");

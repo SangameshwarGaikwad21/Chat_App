@@ -29,7 +29,6 @@ export const logoutUser = createAsyncThunk("auth/logout",async(_,thunkAPI)=>{
     try {
         const response = await logoutAPI()
         return response
-        console.log("Done",response)
     } 
     catch (error) {
          return thunkAPI.rejectWithValue(
@@ -56,7 +55,6 @@ export const UpdateUserProfile = createAsyncThunk("auth/update-profile",
     async (userData, thunkAPI) => {
         try {
             const response = await updateUserProfileAPI(userData);
-            console.log(response.data)
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -98,7 +96,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.success = true;
             state.user = action.payload.user;
-            state.isAuthenticated = true;
+            state.isAuthenticated = false;
         })
         .addCase(registerUser.rejected,(state,action)=>{
             state.loading = false;
@@ -129,7 +127,7 @@ const authSlice = createSlice({
        .addCase(logoutUser.pending, (state) => {
             state.loading = true;
         })
-        .addCase(logoutUser.fulfilled, (state, action) => {
+        .addCase(logoutUser.fulfilled, (state) => {
             state.loading = false;
             state.user = null;
             state.isAuthenticated = false;

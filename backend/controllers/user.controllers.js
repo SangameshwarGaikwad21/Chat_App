@@ -212,6 +212,17 @@ const userProfile =async(req,res)=>{
     }
 }
 
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find({ _id: { $ne: req.user._id } })
+            .select("username avatar bio isOnline lastSeen")
+            .sort({ username: 1 });
+        return res.status(200).json({ success: true, users });
+    } catch {
+        return res.status(500).json({ success: false, message: "Could not fetch users" });
+    }
+};
+
 const updateUserAvatar = async(req,res)=>{
     const avatarLocalPath = req.file?.path;
 
@@ -314,6 +325,7 @@ export{
     loginUser,
     logoutUser,
     userProfile,
+    getUsers,
     updateProfile,
     updateUserAvatar
 }

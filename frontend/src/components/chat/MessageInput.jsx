@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { sendMessage } from "../../redux/auth/message.slice";
+import { getConversations } from "../../redux/auth/conversation.slice";
 
 import socket from "../../socket/socket";
 
@@ -143,6 +144,8 @@ export default function MessageInput() {
           text: formData,
         })
       ).unwrap();
+
+      dispatch(getConversations());
 
       socket.emit(
         "stopTyping",

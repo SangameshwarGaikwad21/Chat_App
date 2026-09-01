@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import Home from "./pages/Home";
@@ -85,21 +85,31 @@ const App = () => {
 
         <Route
           path="/chat"
-          element={<Chat />}
+          element={<ProtectedRoute><Chat /></ProtectedRoute>}
         />
 
         <Route
           path="/profile"
-          element={<Profile />}
+          element={<ProtectedRoute><Profile /></ProtectedRoute>}
         />
 
         <Route
           path="/edit-profile"
-          element={<EditProfile />}
+          element={<ProtectedRoute><EditProfile /></ProtectedRoute>}
         />
       </Routes>
     </div>
   );
 };
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center bg-slate-950 text-slate-400">Loading...</div>;
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
 
 export default App;

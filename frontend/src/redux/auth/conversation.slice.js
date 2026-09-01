@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getConversationsAPI } from "../../services/conversationService";
-import toast from "react-hot-toast";
 
 export const getConversations = createAsyncThunk(
   "conversation/getConversations",

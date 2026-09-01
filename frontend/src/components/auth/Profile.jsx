@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { ArrowLeft,Clock,MessageCircleMore,UserRound,ShieldCheck,} from "lucide-react";
+import { ArrowLeft,Clock,MessageCircleMore,UserRound,} from "lucide-react";
 import { Link } from "react-router-dom";
 import { getUserProfile } from "../../redux/auth/auth.slice";
 
@@ -937,14 +937,9 @@ export default function Profile() {
 
                         {/* Edit Profile */}
 
-                        <motion.button
-                            whileHover={{
-                                scale: 1.02,
-                                y: -1,
-                            }}
-                            whileTap={{
-                                scale: 0.98,
-                            }}
+                        <motion.div
+                            whileHover={{ scale: 1.02, y: -1 }}
+                            whileTap={{ scale: 0.98 }}
                             className="
                                 inline-flex
                                 items-center
@@ -968,14 +963,11 @@ export default function Profile() {
                                 hover:shadow-cyan-500/20
                             "
                         >
-                            <UserRound size={16} />
-                            
-                            <Link to="/edit-profile">
+                            <Link to="/edit-profile" className="flex items-center gap-2">
+                                <UserRound size={16} />
                                 Edit Profile
                             </Link>
-
-                            
-                        </motion.button>
+                        </motion.div>
 
 
                         {/* Go To Chat */}
