@@ -446,7 +446,7 @@ export default function ChatHeader() {
 
               <div className="my-1 border-t border-slate-800" />
 
-              {/* Delete chat */}
+               {/* Delete chat */}
 
               <button
                 type="button"
